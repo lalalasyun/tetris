@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="utf-8" name="viewport" content="width=device-width,user-scalable=no">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="./js/game.js"></script>
+    <script src="./js/control.js"></script>
+    <script src="./js/dot.js"></script>
+    <script src="./js/draw.js"></script>
+    <script src="./js/check.js"></script>
+    <script src="./js/block.js"></script>
+    <link rel="stylesheet" type="text/css" href="./css/indexStyle.css">
+    <title>テトリス</title>
+</head>
+
+<body onload="load();">
+    <table>
+        <tr>
+            <td class="game_panel_class">
+                <table id="hold_panel">
+                    <tr>
+                        <td>
+                            <p class="line">HOLD</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <canvas id="hold_zone" width="100px" height="100px"></canvas>
+                        </td>
+                    </tr>
+                </table>
+
+            </td>
+            <td class="game_panel_class" id="game_panel">
+                <canvas width="400px" height="800px"></canvas>
+                <div>
+                    <canvas id="game_base" width="400px" height="800px"></canvas>
+                    <canvas id="game" width="400px" height="800px"></canvas>
+                    <canvas id="game_ui" width="400px" height="800px"></canvas>
+                </div>
+            </td>
+            <td class="game_panel_class">
+                <table id="next_panel">
+                    <tr>
+                        <td>
+                            <p class="line">NEXT</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <canvas id="next_zone" width="65px" height="310px"></canvas>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <p id="line"></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <p id="level"></p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            
+        </tr>
+    </table>
+    
+
+
+    <br />
+    <div id="cover"></div>
+    <div id="modal">
+        <span id="close">X</span> 操作説明
+        <p>左移動->A</p>
+        <p>右移動->D</p>
+        <p>左回転->Q</p>
+        <p>右移動->E</p>
+        <p>ハードドロップ->SPACE</p>
+        <p>ソフトドロップ->S</p>
+        <p>ホールド->SHIFT</p>
+        <p>開始->ENTER</p>
+        <p>リセット->M</p>
+    </div>
+    <button id="edit">操作説明</button>
+    <button id="getary">現在の配列を保存</button>
+    <button id="left">左[a]</button>
+    <button id="right">右[d]</button>
+    <button id="rotateL">左回転[q]</button>
+    <button id="rotateR">右回転[e]</button>
+    <button id="speedH">ハードドロップ[space]</button>
+    <button id="speedS">ソフトドロップ[s]</button>
+    <button id="hold">ホールド[shift]</button>
+    <button id="start">開始[enter]</button>
+    <button id="end">リセット[m]</button><br>
+    <div id="mess"></div>
+</body>

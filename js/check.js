@@ -1,0 +1,221 @@
+//blockの衝突を調べる
+function isCollision(block_coord) {
+    var ret = false;
+    for (k in block_coord) {
+        b = block_coord[k];
+
+        x = (b.x + position.x);
+        y = (b.y + position.y);
+        if (field[y][x] == 1) {
+            if (y + 1 < h) {
+                if (defin_field[y + 1][x] != 0) {
+                    ret = true;
+                }
+            }
+        }
+
+    }
+    return ret;
+}
+
+//面の接続を調べる(移動量x,移動量y,回転率)
+function isConnect(mx, my, r) {
+    if (r == null) r = position.rotate;
+    block_coord = position.block[r].b;
+    var ret = false;
+
+    for (k in block_coord) {
+        b = block_coord[k];
+
+        x = (b.x + position.x);
+        y = (b.y + position.y);
+        if (x + mx > -1 && x + mx < w && y + my > -1 && y + my < h) {
+            if (defin_field[y + my][x + mx] != 0) {
+                return true;
+            }
+        } else {
+            ret = true;
+        }
+    }
+    return ret;
+}
+
+//回転時の補正値
+//Super Rotation System
+const rotate_key = { 0: 'A', 90: 'B', 180: 'C', 270: 'D' };
+const srs_1 = {
+    A: {
+        D: {
+            shift: [{ x: 1, y: 0 }, { x: 1, y: -1 }, { x: 0, y: 2 }, { x: 1, y: 2 }]
+        },
+        B: {
+            shift: [{ x: -1, y: 0 }, { x: -1, y: -1 }, { x: 0, y: 1 }, { x: -1, y: 1 }]
+        }
+    },
+    B: {
+        A: {
+            shift: [{ x: 1, y: 0 }, { x: 1, y: 1 }, { x: 0, y: -2 }, { x: 1, y: -2 }]
+        },
+        C: {
+            shift: [{ x: 1, y: 0 }, { x: 1, y: 1 }, { x: 0, y: -2 }, { x: 1, y: -2 }]
+        }
+    },
+    C: {
+        B: {
+            shift: [{ x: -1, y: 0 }, { x: -1, y: -1 }, { x: 0, y: 2 }, { x: -1, y: 2 }]
+        },
+        D: {
+            shift: [{ x: 1, y: 0 }, { x: 1, y: -1 }, { x: 0, y: 2 }, { x: 1, y: 2 }]
+        }
+    },
+    D: {
+        C: {
+            shift: [{ x: -1, y: 0 }, { x: -1, y: 1 }, { x: 0, y: 2 }, { x: -1, y: 2 }]
+        },
+        A: {
+            shift: [{ x: -2, y: 0 }, { x: -2, y: 1 }, { x: 0, y: -2 }, { x: -1, y: -2 }]
+        }
+    }
+
+};
+const srs_2 = {
+    A: {
+        D: {
+            shift: [{ x: -1, y: 0 }, { x: 2, y: 0 }, { x: -1, y: 2 }, { x: 2, y: -1 }]
+        },
+        B: {
+            shift: [{ x: -2, y: 0 }, { x: 1, y: 0 }, { x: -2, y: 1 }, { x: 1, y: -2 }]
+        }
+    },
+    B: {
+        A: {
+            shift: [{ x: 2, y: 0 }, { x: -1, y: 0 }, { x: 2, y: -1 }, { x: -1, y: 2 }]
+        },
+        C: {
+            shift: [{ x: -1, y: 0 }, { x: 2, y: 0 }, { x: -1, y: -2 }, { x: 2, y: 1 }]
+        }
+    },
+    C: {
+        B: {
+            shift: [{ x: 1, y: 0 }, { x: -2, y: 0 }, { x: 1, y: 2 }, { x: -2, y: -1 }]
+        },
+        D: {
+            shift: [{ x: 2, y: 0 }, { x: -1, y: 0 }, { x: 2, y: -1 }, { x: -1, y: 2 }]
+        }
+    },
+    D: {
+        C: {
+            shift: [{ x: 1, y: 0 }, { x: -2, y: 0 }, { x: -2, y: 1 }, { x: 1, y: -2 }]
+        },
+        A: {
+            shift: [{ x: -2, y: 0 }, { x: 1, y: 0 }, { x: 1, y: 2 }, { x: -2, y: -1 }]
+        }
+    }
+
+};
+//回転した方向(角度1,角度2)
+function super_rotation(rotate1, rotate2) {
+
+    if (!isConnect(0, 0, rotate2)) return { x: 0, y: 0 };
+    var s;
+
+    if(position.block.key == 'i'){
+        s = srs_2[rotate_key[rotate1]][rotate_key[rotate2]].shift;
+    }else{
+        s = srs_1[rotate_key[rotate1]][rotate_key[rotate2]].shift;
+    }
+
+    for (i in s) {
+        if (!isConnect(s[i].x, s[i].y, rotate2)) {
+
+            return { x: s[i].x, y: s[i].y };
+        }
+    }
+
+    return null;
+}
+
+//揃った列を調べる
+function check_line() {
+    var list = [];
+    var del_cnt = 0;
+    for (i = 0; i < h; i++) {
+        isCheck = false;
+        for (n = 0; n < w; n++) {
+            if (defin_field[i][n] == 0)
+                isCheck = true;
+        }
+        if (isCheck) {
+            list.push(defin_field[i]);
+        } else {
+            del_cnt++;
+        }
+    }
+    for (n = 0; n < del_cnt; n++) {
+        list.unshift([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    }
+    defin_field = list;
+    return del_cnt;
+}
+
+//10lineの達成を調べる
+var line10_count = 10;
+function isLine10(cnt) {
+    if (cnt >= line10_count) {
+        line10_count += 10;
+        return true;
+    }
+    return false;
+}
+
+//?行目まで積まれているか調べる
+function get_block_hight(y) {
+    for (i in defin_field[y]) {
+        if (defin_field[y][i] != 0)
+            return true;
+    }
+    return false;
+}
+
+//ロックダウンモード
+var move_cnt = 0;
+var lockdown_cnt = 0;
+var lockdown_id;
+function lockdown_mode(isKeyEvent) {
+    //下キー入力の場合lockdown終了
+    if (isKeyEvent) {
+        move_cnt = 16;
+        lockdown_timer();
+        return;
+    }
+
+    //0.5秒置きに入力があるか調べる
+    if (lockdown_id == null) {
+        lockdown_id = setInterval(lockdown_timer, 500);
+    }
+
+}
+
+//入力がなければ次のblockを降らす
+const lockdown_timer = function () {
+    if (lockdown_cnt == 0 || move_cnt > 15) {
+
+        clearInterval(lockdown_id);
+        clearInterval(IntervalId);
+        lockdown_id = null;
+        if (isConnect(0, 1)) {
+            definition_block();
+            get_next();
+            set_block_field();
+        } else {
+            IntervalId = setInterval(fall_block, get_fall_time());
+            move_cnt = 0;
+            fall_block();
+
+        }
+        move_cnt = 0;
+    }
+    move_cnt += lockdown_cnt;
+
+    lockdown_cnt = 0;
+}

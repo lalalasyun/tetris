@@ -1,0 +1,73 @@
+#game_base,#hold_zone,#next_zone{
+    background-color: black;
+    
+}
+#line,#level{
+    color: blue;
+    font-weight: bold;
+}
+.line_table{
+    height: 10px;
+}
+body{
+    background-color: rgba(14, 9, 9, 0.819);
+    
+}
+#game_panel{
+    background-color: aqua;
+    padding: 10px;
+    border-radius: 0px 0px 10px 10px;
+}
+#hold_panel{
+    background-color: aqua;
+    padding: 10px;
+    border-radius: 10px 0px 0px 10px;
+    margin-right: -2px;
+}
+#next_panel{
+    background-color: aqua;
+    padding: 10px;
+    border-radius: 0px 10px 10px 0px;
+    margin-left: -2px;
+}
+p.line{
+    margin: 0px;
+    height:"5px";
+    font-weight: bold;
+}
+td.game_panel_class{
+    vertical-align: top;
+    margin: 0px;
+    padding: 0px;
+}
+#cover {
+    position: absolute;
+    min-width: 100%;
+    min-height: 100%;
+    background: rgba(0,0,0,0.25);
+    z-index: 1;
+    display: none;
+  }
+  
+  #modal {
+    position: absolute;
+    width: 33%;
+    left: 33%;
+     top: 20%;
+    height: auto;
+    background: rgba(255,255,255, 1);
+    z-index: 2;
+    display: none;
+  }
+/*
+  canvasをレイヤーとして使う
+*/
+  #game,#game_ui,#game_base{
+    position: absolute;
+    left: 148px;
+    top: 20px;
+    
+  }
+  canvas{
+    border-radius: 5px;
+  }
