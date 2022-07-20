@@ -12,8 +12,8 @@ $(function () {
 
     /// 長押し・ロングタップを検知する
 
-    $('#left').mouseup(leftdown).mousedown(leftup);
-    $('#right').mouseup(rightdown).mousedown(rightup);
+    $('#left').mousedown(leftdown).mouseup(leftup);
+    $('#right').mousedown(rightdown).mouseup(rightup);
 
     $('#hold').mousedown(hold)
 
@@ -236,30 +236,31 @@ $(function () {
         set_hold_block();
         isHoldLock = true;
     }
+    
 
     const speedH = function () {
-        while (!isConnect(0, 1, position.rotate)) {
-            fall_block();
-        }
-        fall_block(true);
-
-
+        timerId3 = setInterval(function(){
+            while (!isConnect(0, 1, position.rotate)) {
+                fall_block();
+            }
+            fall_block(true);
+        },300);
     }
 
     function speedHdown() {
         if (timerId3 == null) {
-            timerId3 = setInterval(speedH, 200);
+            timerId3 = setTimeout(speedH, 1000);
+            while (!isConnect(0, 1, position.rotate)) {
+                fall_block();
+            }
             fall_block(true);
         }
     }
 
     function speedHup() {
-
-
         clearInterval(timerId3);
         timerId3 = null;
 
-        speedH();
     }
 
     var s_key_down_cnt = 0;
@@ -327,18 +328,22 @@ $(function () {
     }
 
     function end() {
+        speedHup();
+        
         //操作フィールド[10,23]
         field = init_field();
 
         $('#mess').text('');
         clearInterval(IntervalId);
+        
+
         isFall = false;
         isGame = false;
         init_game();
         init_game_ui();
         set_dot(temp_dot.home);
         
-
+        
 
         //hold
         isHoldLock = false;
