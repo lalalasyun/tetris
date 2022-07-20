@@ -5,7 +5,7 @@ let isHoldLock = false;
 /// 長押しを検知する閾値
 const LONGPRESS = 50;
 /// 長押し実行タイマーのID
-let timerId1, timerId2, timerId3, timerId4;
+let timerId1, timerId2, timerId3, timerId4,timerId5;
 
 $(function () {
 
@@ -96,15 +96,23 @@ $(function () {
         b = position.block[rotate];
         d = super_rotation(coord.rotate, rotate);
         if (d == null) return;
+
+        
+        
+
         //lockdown_cntを増やす
         lockdown_cnt++;
 
         coord.x += d.x;
         coord.y += d.y;
         coord.rotate = rotate;
+
+        tspin = d;
+
         if (coord.y + b.h > h) {
             definition_block();
         } else {
+            init_game();
             set_block_field();
         }
     }
@@ -117,24 +125,35 @@ $(function () {
             rotate = 0;
         }
         d = super_rotation(coord.rotate, rotate);
-        if (isConnect(d.x, d.y, rotate)) {
-            return;
-        }
+        if (d == null) return;
+        
         //lockdown_cntを増やす
         lockdown_cnt++;
 
         coord.x += d.x;
         coord.y += d.y;
         coord.rotate = rotate;
+
+        tspin = d;
+
         if (coord.y + b.h > h) {
             definition_block();
         } else {
+            init_game();
             set_block_field();
         }
     }
 
     function leftdown() {
-        clearTimeout(timerId1);
+        if(timerId1 != null){
+            clearTimeout(timerId1);
+            timerId1 = null
+        }
+        if(timerId2 != null){
+            clearTimeout(timerId2);
+            timerId2 = null;
+        }
+        
         timerId1 = setInterval(function () {
 
             if (isConnect(-1, 0)) {
@@ -145,18 +164,32 @@ $(function () {
             lockdown_cnt++;
 
             coord.x--;
+            tspin = null;
 
+            init_game();
             set_block_field();
         }, LONGPRESS);
 
     }
 
     function leftup() {
-        clearTimeout(timerId1);
+        if(timerId1 != null){
+            clearTimeout(timerId1);
+            timerId1 = null
+        }
+        
     }
 
     function rightdown() {
-        clearTimeout(timerId2);
+        if(timerId2 != null){
+            clearTimeout(timerId2);
+            timerId2 = null;
+        }
+        if(timerId1 != null){
+            clearTimeout(timerId1);
+            timerId1 = null
+        }
+        
         timerId2 = setInterval(function () {
 
             b = position.block[position.rotate];
@@ -169,13 +202,18 @@ $(function () {
             lockdown_cnt++;
 
             coord.x++;
+            tspin = null;
 
+            init_game();
             set_block_field();
         }, LONGPRESS);
     }
 
     function rightup() {
-        clearTimeout(timerId2);
+        if(timerId2 != null){
+            clearTimeout(timerId2);
+            timerId2 = null;
+        }
 
     }
 
@@ -185,13 +223,15 @@ $(function () {
 
         if (hold_block == null) {
             hold_block = coord.block;
-            coord.block = block_dict[set_block()];
+            coord.block = block_dict[get_block()];
         } else {
             move_block = hold_block;
             hold_block = coord.block;
             coord.block = move_block;
         }
         coord.x = 4, coord.y = 0, coord.rotate = 0;
+        init_game();
+        init_hold();
         set_block_field();
         set_hold_block();
         isHoldLock = true;
@@ -203,25 +243,23 @@ $(function () {
         }
         fall_block(true);
 
-        clearInterval(timerId3);
 
     }
 
     function speedHdown() {
         if (timerId3 == null) {
             timerId3 = setInterval(speedH, 200);
+            fall_block(true);
         }
     }
 
     function speedHup() {
-        while (!isConnect(0, 1, position.rotate)) {
-            fall_block();
-        }
-        fall_block(true);
+
+
         clearInterval(timerId3);
         timerId3 = null;
 
-
+        speedH();
     }
 
     var s_key_down_cnt = 0;
@@ -229,7 +267,7 @@ $(function () {
         if (s_key_down_cnt > 20) {
             if (timerId4 != null) {
                 clearInterval(timerId4);
-                timerId4 = setInterval(fall_block, 20, true);
+                timerId4 = setInterval(fall_block, get_fall_time() / 20, true);
                 s_key_down_cnt = 0;
                 return;
             }
@@ -242,21 +280,33 @@ $(function () {
     }
 
     function speedSup() {
-        fall_block(true);
+        //他のキーが押されていない間だけ
+        if(timerId1 == null && timerId2 == null){
+            fall_block(true);
+        }
+        
 
         clearInterval(timerId4);
         clearInterval(IntervalId);
+
+        s_key_down_cnt = 0;
 
         timerId4 = null;
         IntervalId = setInterval(fall_block, get_fall_time());
 
     }
 
+    
     function start() {
         if (isGame) return;
+        
+
+        //確定済みフィールド[10,23]
+        defin_field = init_field();
+
         init_game_ui();
-        get_dot(temp_dot.ready);
-        setTimeout(() => { delay_start() }, 1000);
+        set_dot(temp_dot.ready);
+        timerId5 = setTimeout(() => { delay_start() }, 1000);
     }
     //スタートを押して一秒後にゲームを起動
     function delay_start() {
@@ -266,29 +316,29 @@ $(function () {
         init_game_ui();
         set_hold_block();
         $('#line').text(count_line + 'LINES');
-        $('#level').text('1LEVEL');
-        coord.x = 4, coord.y = 0, coord.rotate = 0;
+        $('#level').text('0LEVEL');
+        coord.x = 4, coord.y = 1, coord.rotate = 0;
         block_list = get_block_list();
 
         set_next_block();
-        coord.block = block_dict[set_block()];
+        coord.block = block_dict[get_block()];
         clearInterval(IntervalId);
         IntervalId = setInterval(fall_block, get_fall_time());
     }
 
     function end() {
+        //操作フィールド[10,23]
+        field = init_field();
+
         $('#mess').text('');
         clearInterval(IntervalId);
         isFall = false;
         isGame = false;
         init_game();
         init_game_ui();
-        get_dot(temp_dot.home);
-        //操作フィールド[10,23]
-        field = init_field();
+        set_dot(temp_dot.home);
+        
 
-        //確定済みフィールド[10,23]
-        defin_field = init_field();
 
         //hold
         isHoldLock = false;
@@ -307,11 +357,25 @@ $(function () {
 
         //lockdownモードを止める
         if (lockdown_id == null) {
+            move_cnt = 0;
+            lockdown_cnt = 0;
+            lockdown_hight = 0;
             clearInterval(lockdown_id)
             lockdown_id = null;
         }
 
-        get_dot(temp_dot.home);
+        //starttimerを止める
+        if(timerId5 != null){
+            clearInterval(timerId5)
+        }
+
+        //コンボカウントを0
+        ren_count = 0;
+
+        //back
+        backtoback_count = 0;
+
+        set_dot(temp_dot.home);
 
     }
 

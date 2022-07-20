@@ -11,24 +11,28 @@ const fall_block = isKeyEvent => {
         return;
     }
     coord.y++;
+
+    init_game();
     set_block_field();
 
 }
 
 
 //blockの確定
-var definition_block = function () {
+function definition_block(d) {
     var isFin = false;
     for (i = 0; i < h; i++) {
         for (n = 0; n < w; n++) {
             if (field[i][n] == 1) {
+                if(defin_field[i][n] != 0)isFin = true;
                 defin_field[i][n] = position.block.color;
-                if (i < 2) isFin = true;
             }
         }
     }
+    init_game();
 
-    del_block_field(position);
+    field = init_field();
+
     set_definition_block();
     clearInterval(IntervalId);
 
@@ -39,28 +43,72 @@ var definition_block = function () {
     }
 
     //壊したlineの数を取得し画面に描画する
-    var cnt = check_line();
+    var line_list = check_line();
+
+    
+
+    cnt = line_list.length;
+
+    init_event_text();
+
+    //tspin
+    if(tspin != null){
+        result = check_tspin(cnt,tspin);
+        if(result != null){
+            backtoback_count++;
+            set_tspin(result);
+        }
+    }
+
+
+    remove_line(line_list);
+    set_line_effect(line_list);
     count_line += cnt;
 
     level = Math.floor(count_line/10);
-    if (cnt > 0) {
-        clearInterval(dot_timer_Id);
-        get_dot(get_lineCount(cnt));
-        dot_timer_Id = setTimeout(() => {
-            init_game_ui();
-        }, 1000);
+
+    init_game_ui();
+    clearInterval(dot_timer_Id);
+    if(cnt > 0){
+        ren_count++;
+        
+        set_ren();
+        if(cnt == 4){
+            backtoback_count++;
+            set_backtoback();
+    
+            setTimeout(function(){set_tetris(line_list)},200);
+        }else{
+            backtoback_count = 0;
+        }
+    }else{
+        ren_count = 0;
     }
+
+    if(isPerfect())set_perfect();
+    
+
+    if (isLine10(count_line)) set_levelup();
+    
+    
+    
+
+    dot_timer_Id = setTimeout(() => {
+        init_game_ui();
+    }, 1000);
 
 
     set_next_block();
 
     $('#line').text(count_line + 'LINES');
-    $('#level').text(level+1 + 'LEVEL');
+    $('#level').text(level + 'LEVEL');
 
     //ホールドのロックを解除する
     isHoldLock = false;
 
     isFall = true;
+
+    tspin = null;
 
     IntervalId = setInterval(fall_block, get_fall_time());
 
@@ -70,19 +118,19 @@ var definition_block = function () {
 //左から4列目にミノの左端がくる
 //Oミノだけは左から5列目にミノの左端が来る
 function get_next() {
-    block_name = set_block();
+    block_name = get_block();
     coord.block = block_dict[block_name];
     coord.x = block_name == 'o' ? 5 : 4;
-    coord.y = 3 - coord.block[0].h;
+    coord.y = 2;position.y = 1;
     coord.rotate = 0;
-
+    
 
 }
 
 //fieldにblockをセット
 function set_block_field() {
     //前回のblockを消去
-    del_block_field(position);
+    field = init_field();
 
     //新しい位置を保存
     position = { x: coord.x, y: coord.y, block: coord.block, rotate: coord.rotate };
@@ -97,25 +145,34 @@ function set_block_field() {
 
         field[y][x] = 1;
     }
-
-    set_move_block();
     set_definition_block();
-    get_ghost();
+    set_move_block();
+    
+    set_ghost();
 }
 
+//揃ったlineを消去しずらす
+function remove_line(list){
+    //list[揃ったlineのindexが格納]
+    //新しいfeild
+    var new_field = init_field();
 
-
-//blockを消去
-function del_block_field() {
-    for (i = 0; i < h; i++) {
-        for (n = 0; n < w; n++) {
-            field[i][n] = 0;
+    var index = 22;
+    for(i in defin_field){
+        if(list.indexOf(parseInt(22-i)) == -1){
+            new_field[index] = defin_field[22-i];
+            index--;
         }
+        
     }
+    defin_field = new_field;
 }
+
+
+
 
 //block_listから先頭のblockを取り出す
-function set_block() {
+function get_block() {
     var result = block_list[block.i][block.n];
     block.n++;
     if (block.n == 7) {

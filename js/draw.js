@@ -1,6 +1,5 @@
 //canvasに移動block配列を描画する
 function set_move_block() {
-    init_game();
 
     context1.beginPath();
 
@@ -50,7 +49,7 @@ function set_definition_block() {
 function set_line() {
 
     context5.beginPath();
-    context5.strokeStyle = 'grey';
+    context5.strokeStyle = get_rgba('grey', 1, 0.3);
     context5.lineWidth = 2;
     for (var i = 1; i < w; i++) {
         context5.moveTo(i * box, 0);
@@ -101,7 +100,9 @@ function set_hold_line(key) {
 //holdを描画
 function set_hold_block() {
     if (hold_block == null) return;
-    del_block_field();
+
+    field = init_field();
+
     hbox = 6;
     context2.beginPath();
     context2.clearRect(0, 0, hold_zone.width, hold_zone.height);
@@ -190,16 +191,16 @@ function set_next_block() {
 }
 
 //dot文字を表示(配列,x,y,zoom)
-function set_dot(dot, d1, i, s) {
+function set_dot_text(ctx,dot, d1, i, s) {
     //改行判定
     if (dot.length == 0) {
         return;
     }
     dot_box = box;
     dot_dot = dot_box / 7;
-    context4.beginPath();
+    ctx.beginPath();
 
-    context4.beginPath();
+    ctx.beginPath();
     for (i1 = 0; i1 < 7; i1++) {
 
         for (n1 = 0; n1 < 7; n1++) {
@@ -210,18 +211,19 @@ function set_dot(dot, d1, i, s) {
                 fwh = dot_dot * s.z;
                 color = color_dict[dot[i1][n1]];
 
-                context4.fillStyle = get_rgba(color, 1, 2);
-                context4.strokeRect(fx + s.c, fy, fwh, fwh);
-                context4.fillRect(fx + s.c, fy, fwh, fwh);
+                ctx.fillStyle = get_rgba(color, 1, 2);
+                ctx.strokeRect(fx + s.c, fy, fwh, fwh);
+                ctx.fillRect(fx + s.c, fy, fwh, fwh);
             }
         }
     }
 }
 
 //ゴーストを取得描画
-function get_ghost() {
+function set_ghost() {
+    if (!isFall) return;
     var ghost_y = 0;
-    for (i = 0; i < h; i++) {
+    for (i = 1; i < h; i++) {
         if (isConnect(0, i)) {
             ghost_y = i;
             break;
@@ -251,6 +253,24 @@ function get_ghost() {
     }
 }
 
+//lineclearのeffect
+function set_line_effect(line){
+    context6.beginPath();
+    context6.fillStyle = get_rgba('white', 0.6, 1.2);
+
+    for(i in line){
+        context6.fillRect(0, (line[i] - 3) * box, box*10, box);
+    }
+
+    //0.x秒後に削除
+    setTimeout(init_effect,200);
+}
+
+//line_eventの表示
+//REN
+//tspin
+//Back to Back
+
 
 
 //canvasを初期化
@@ -262,4 +282,19 @@ function init_game() {
 function init_game_ui() {
     context4.beginPath();
     context4.clearRect(0, 0, game_ui.width, game_ui.height);
+}
+
+function init_hold(){
+    context2.beginPath();
+    context2.clearRect(0, 0, hold_zone.width, hold_zone.height);
+}
+
+function init_effect(){
+    context6.beginPath();
+    context6.clearRect(0, 0, game_effect.width, game_effect.height);
+}
+
+function init_event_text(){
+    context7.beginPath();
+    context7.clearRect(0, 0, event_zone.width, event_zone.height);
 }

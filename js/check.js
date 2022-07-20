@@ -1,23 +1,3 @@
-//blockの衝突を調べる
-function isCollision(block_coord) {
-    var ret = false;
-    for (k in block_coord) {
-        b = block_coord[k];
-
-        x = (b.x + position.x);
-        y = (b.y + position.y);
-        if (field[y][x] == 1) {
-            if (y + 1 < h) {
-                if (defin_field[y + 1][x] != 0) {
-                    ret = true;
-                }
-            }
-        }
-
-    }
-    return ret;
-}
-
 //面の接続を調べる(移動量x,移動量y,回転率)
 function isConnect(mx, my, r) {
     if (r == null) r = position.rotate;
@@ -135,27 +115,76 @@ function super_rotation(rotate1, rotate2) {
     return null;
 }
 
+//tspinの判定
+const shift_corner = [{x:0,y:0},{x:2,y:0},{x:0,y:2},{x:2,y:2}];
+const shift_convex = [{x:1,y:0},{x:0,y:1},{x:1,y:2},{x:2,y:1}]
+const ts_key = ['ts','tss','tsd','tst'];
+const tsm_key = ['tsm','tsms','tsmd'];
+function check_tspin(cnt,d){
+    if(position.block.key != 't' || d == null) return null;
+    var corner_cnt = 0;
+    for(i in shift_corner){
+        x = position.x + shift_corner[i].x;
+        y = position.y + shift_corner[i].y;
+        if(x > -1 && x < 10 && y > -1 && y < 23){
+            if(defin_field[y][x] != 0){
+                corner_cnt++;
+            }
+        }else{
+            corner_cnt++;
+        }
+    }
+    
+   
+    if(corner_cnt < 3){
+        return null;
+    }
+
+    //tspin miniかどうか
+    //1T-Spinの条件を満たしていること。
+    //2ミノ固定時のＴミノ４隅のうち、凸側の1つが空いていること。
+    //3SRSのにおける回転補正の４番目（回転軸移動が(±1,±2)）でないこと
+    var convex_count = 0;
+    if(!(d.x == 1 && d.y == 2)){
+
+        for(i in shift_convex){
+            x = position.x + shift_corner[i].x;
+            y = position.y + shift_corner[i].y;
+            if(x > -1 && x < 10 && y > -1 && y < 23){
+                if(defin_field[y][x] != 0){
+                    convex_count++;
+                }
+            }
+        }
+        if(convex_count < 3) return tsm_key[cnt];
+            
+
+    }
+
+   
+    return ts_key[cnt];
+
+
+    
+}
+
 //揃った列を調べる
 function check_line() {
     var list = [];
-    var del_cnt = 0;
     for (i = 0; i < h; i++) {
         isCheck = false;
         for (n = 0; n < w; n++) {
-            if (defin_field[i][n] == 0)
+            if (defin_field[i][n] == 0){
                 isCheck = true;
+                break;
+            }
+                
         }
-        if (isCheck) {
-            list.push(defin_field[i]);
-        } else {
-            del_cnt++;
-        }
+        if (!isCheck) {
+            list.push(i);
+        } 
     }
-    for (n = 0; n < del_cnt; n++) {
-        list.unshift([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-    }
-    defin_field = list;
-    return del_cnt;
+    return list;
 }
 
 //10lineの達成を調べる
@@ -168,18 +197,24 @@ function isLine10(cnt) {
     return false;
 }
 
-//?行目まで積まれているか調べる
-function get_block_hight(y) {
-    for (i in defin_field[y]) {
-        if (defin_field[y][i] != 0)
-            return true;
+//perfectを調べる
+function isPerfect(){
+    for(i in defin_field){
+        for(n in defin_field[i]){
+            if(defin_field[i][n] != 0){
+                return false;
+            }
+        }
     }
-    return false;
+    return true;
 }
+
+
 
 //ロックダウンモード
 var move_cnt = 0;
 var lockdown_cnt = 0;
+var lockdown_hight = 0;
 var lockdown_id;
 function lockdown_mode(isKeyEvent) {
     //下キー入力の場合lockdown終了
@@ -191,6 +226,12 @@ function lockdown_mode(isKeyEvent) {
 
     //0.5秒置きに入力があるか調べる
     if (lockdown_id == null) {
+        lockdown_cnt = 0;
+        move_cnt = 0;
+        
+
+        lockdown_hight = coord.y;
+
         lockdown_id = setInterval(lockdown_timer, 500);
     }
 
@@ -203,19 +244,28 @@ const lockdown_timer = function () {
         clearInterval(lockdown_id);
         clearInterval(IntervalId);
         lockdown_id = null;
+        //接続を調べる
         if (isConnect(0, 1)) {
-            definition_block();
-            get_next();
-            set_block_field();
+            if(!definition_block()){
+                init_game();
+                get_next();
+                set_block_field();
+            }
+            
         } else {
+            if(lockdown_hight < coord.y){
+                move_cnt = 0;
+            }else{
+                //ロックダウンモードの継続
+                lockdown_id = setInterval(lockdown_timer, 500);
+            }
             IntervalId = setInterval(fall_block, get_fall_time());
-            move_cnt = 0;
             fall_block();
-
         }
         move_cnt = 0;
     }
     move_cnt += lockdown_cnt;
 
     lockdown_cnt = 0;
+
 }

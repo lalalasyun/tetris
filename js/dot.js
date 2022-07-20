@@ -10,9 +10,9 @@ const temp_dot = {
         '!+40',
         '{"z":2,"p":1.3}!+2!t4!e6!t2!r3!i1!s7!+1',
         '!+30',
-        '{"z":1,"p":1}!+4!s1!t1!a1!r1!t1!+3',
+        '{"c":-20}!+4!s1!t1!a1!r1!t1!+3',
         '!+10',
-        '!+4!e4!n4!t4!e4!r4'
+        '{"c":-20}!+4!e4!n4!t4!e4!r4'
     ],
     end: [
         '!+60',
@@ -28,60 +28,90 @@ const temp_dot = {
         '!+80',
         '{"z":2,"p":1.7,"c":12}!+2!r2!e2!a2!d2!y2'
     ],
-    single:
-        '{"z":2,"p":1.5,"c":-15}!+2!s1!i1!n1!g1!l1!e1'
-    ,
-    double:
-        '{"z":2,"p":1.5,"c":-15}!+2!d1!o1!u1!b1!l1!e1'
-    ,
-    triple:
-        '{"z":2,"p":1.5,"c":-15}!+2!t1!r1!i1!p1!l1!e1'
-    ,
     tetlis:
-        '{"z":2,"p":1.5,"c":-15}!+2!t1!e1!t1!l1!i1!s1'
+        '{"z":1.2,"p":1.1,"c":26}!+2!t2!e2!t2!l2!i2!s2'
     ,
-    level:'{"z":2,"p":1.5,"c":-15}!l2!e2!v2!e2!l2'
-    //追加予定
-    //1段消し…シングル
-    //2段消し…ダブル
-    //3段消し…トリプル
-    //4段消し…テトリス
-    //level up
+    level:'!l2!e2!v2!e2!l2!+1!u2!p2'
+    ,
+    ren:'!r6!e6!n6'
+    ,
+    back:['!+10',
+        '{"z":0.7,"p":0.5,"c":5}!b5!a5!c5!k5!t5!o5',
+    '{"z":0.7,"p":0.5,"c":5}!b5!a5!c5!k5'],
+    perfect:['!+30',
+        '{"z":1.2,"p":1.1,"c":90}!p2!e2!r2!f2!e2!c2!t2',
+        '{"z":2,"p":1.7,"c":140}!c2!l2!e2!a2!r2'
+    ,
+]
 }
-
+const spin_text = {
+    ts:'{"z":1,"p":0.7,"c":7}!t7!s7!p7!i7!n7',
+    s:'{"z":0.7,"p":0.55,"c":7}!s2!i2!n2!g2!l2!e2',
+    d:'{"z":0.7,"p":0.55,"c":7}!d2!o2!u2!b2!l2!e2',
+    t:'{"z":0.7,"p":0.55,"c":7}!t2!r2!i2!p2!l2!e2',
+    m:'{"z":0.7,"p":0.5,"c":7}!m6!i6!n6!i6',
+}
+const spin = {
+    ts:['!+20',spin_text.ts],
+    tss:['!+20',spin_text.ts,spin_text.s],
+    tsd:['!+20',spin_text.ts,spin_text.d],
+    tst:['!+20',spin_text.ts,spin_text.t],
+    tsm:['!+20',spin_text.ts,spin_text.m],
+    tsms:['!+20',spin_text.ts,spin_text.m,spin_text.s],
+    tsmd:['!+20',spin_text.ts,spin_text.m,spin_text.d],
+}
 //dot文字を取得
-function get_dot(str) {
+function set_dot(str,ctx) {
+    if(ctx == null) ctx = context4;
     dot_list = changeDot(str);
     for (d1 in dot_list) {
         for (i = 0; i < dot_list[d1].length; i++) {
             style = dot_list[d1][i].style;
-            set_dot(dot_list[d1][i].o, d1, i - style.p, style);
+            set_dot_text(ctx,dot_list[d1][i].o, d1, i - style.p, style);
         }
     }
 }
 
+function set_levelup(){
+    set_dot(['!+60','{"z":1,"p":1}!+2'+temp_dot.level]);
+}
 
-function get_lineCount(cnt) {
-    var add_str_line10 = '{"z":1,"p":1.3}';
-    if (isLine10(count_line)) {
-        var str = String(level+1);
-        add_str_line10 += '!+2';
-        for (i in str) {
-            add_str_line10 += '!' + str[i] + '7';
-        }
-        add_str_line10 += temp_dot.level;
-    }
-    var key = ['single','double','triple','tetlis']
+const set_tetris = list => {
+    var add_new_line = '!+'+String(list[0] - 3)+0;
 
-    add_str = temp_dot[key[cnt-1]];
-    
-    cnt_str = [
-        '!+60',
-        add_str_line10,
-        '!+10',
-        add_str
+    set_str = [
+        add_new_line,
+        temp_dot.tetlis
     ]
-    return cnt_str;
+
+    set_dot(set_str);
+};
+
+function set_perfect(){
+    set_dot(temp_dot.perfect);
+}
+
+function set_tspin(key){
+    if(key == null)return;
+    set_dot(spin[key] ,context7);
+}
+
+
+
+function set_ren(){
+    count_ary = String(ren_count)
+    var count_str = '';
+    for(i in count_ary){
+        count_str += '!'+count_ary[i];
+    }
+
+    set_str = ['{"z":0.7,"p":0.7,"c":15}'+count_str+temp_dot.ren];
+    set_dot(set_str,context7);
+}
+
+function set_backtoback(){
+    if(backtoback_count < 2)return;
+    set_dot(temp_dot.back,context7);
 }
 
 const json_temp = {z:1,p:1,c:0};

@@ -1,7 +1,7 @@
 //800px,400px
 //canvas,context
-var game, hold_zone, next_zone, game_ui,game_base;
-var context1, context2, context3, context4,context5;
+var game, hold_zone, next_zone, game_ui,game_base ,game_effect,event_zone;
+var context1, context2, context3, context4,context5,context6,context7;
 
 const h = 23;
 const w = 10;
@@ -22,7 +22,7 @@ const fall_speed = [1.0,0.793,0.618,0.473,0.355,0.262,0.190,0.135,0.094,0.064,0.
 var field = init_field();
 
 //確定済みフィールド[10,23]
-var defin_field = init_field();
+var defin_field;
 
 //落ちてくるブロック
 var block_list;
@@ -33,8 +33,17 @@ var hold_block;
 //消したline
 var count_line = 0;
 
+//コンボカウント
+var ren_count = 0;
+
+//backtoback
+var backtoback_count = 0;
+
 //timer
 var dot_timer_Id;
+
+//tspin event
+var tspin = null;
 
 //block
 const block_dict = {
@@ -293,10 +302,10 @@ var coord = { x: 4, y: 0, block: [], rotate: 0 };
 var gameover_dot_timer_ID;
 function game_over() {
     init_game_ui();
-    get_dot(temp_dot.end);
+    set_dot(temp_dot.end);
     isFall = false;
     clearInterval(timerId4);
-    get_dot(temp_dot.press_M);
+    set_dot(temp_dot.press_M);
     if(gameover_dot_timer_ID == null){
         gameover_dot_timer_ID = setInterval(set_gameover_dot_timer, 500);
     }
@@ -306,7 +315,7 @@ var gameover_time = 0;
 const set_gameover_dot_timer = function () {
     context4.clearRect(0, 400, game_ui.width, game_ui.height);
     if (gameover_time % 2 == 1) {
-        get_dot(temp_dot.press_M);
+        set_dot(temp_dot.press_M);
     }
     if (gameover_time > 4) {
         clearInterval(gameover_dot_timer_ID);
@@ -325,16 +334,29 @@ function load() {
     next_zone = document.getElementById('next_zone');
     game_ui = document.getElementById('game_ui');
     game_base = document.getElementById('game_base');
+    game_effect = document.getElementById('game_effect');
+    event_zone = document.getElementById('event_zone');
+
     context1 = game.getContext('2d');
     context2 = hold_zone.getContext('2d');
     context3 = next_zone.getContext('2d');
     context4 = game_ui.getContext('2d');
     context5 = game_base.getContext('2d');
+    context6 = game_effect.getContext('2d');
+    context7 = event_zone.getContext('2d');
 
     set_line();
     set_move_block();
-    get_dot(temp_dot.home);
+    set_dot(temp_dot.home);
 
+}
+
+
+function get_fall_time(){
+    set_level = level;
+    if(set_level > 14)set_level = 14;
+
+    return fall_speed[set_level]*1000;
 }
 
 //fieldを初期化
@@ -366,7 +388,32 @@ function init_field() {
     return f;
 }
 
-
-function get_fall_time(){
-    return fall_speed[level]*1000;
+//fieldを初期化(カスタムフィールド)
+function custum_field() {
+    f = [
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 1, 1, 1, 1, 1, 1, 1, 1],
+        [0, 0, 0, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 0, 1, 1, 1, 1, 1, 1, 1],
+        [1, 0, 0, 1, 1, 1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 1, 1, 1, 1, 1, 1],
+        [1, 1, 0, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 0, 1, 1, 1, 1, 1, 1, 1]];
+    return f;
 }
+
