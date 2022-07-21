@@ -100,7 +100,7 @@ function definition_block(d) {
 
     set_next_block();
 
-    $('#line').text(count_line + 'LINES');
+    $('#line').text(count_line + 'LINE');
     $('#level').text(level + 'LEVEL');
 
     //ホールドのロックを解除する
@@ -178,6 +178,7 @@ function get_block() {
     if (block.n == 7) {
         block.n = 0;
         block.i++;
+        if(block.i == 99)block.i=0;
     }
     return result;
 }

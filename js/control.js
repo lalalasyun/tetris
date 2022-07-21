@@ -12,23 +12,23 @@ $(function () {
 
     /// 長押し・ロングタップを検知する
 
-    $('#left').mousedown(leftdown).mouseup(leftup);
-    $('#right').mousedown(rightdown).mouseup(rightup);
+    $('#left').on('touchstart', leftdown).on('touchend', leftup);
 
-    $('#hold').mousedown(hold)
+    $('#right').on('touchstart', rightdown).on('touchend', rightup);
+
+    $('#hold_panel').on('touchstart', hold)
 
     $('#rotateL').mousedown(rotateL)
     $('#rotateR').mousedown(rotateR)
 
-    $('#speedH').mousedown(speedHdown).mouseup(speedHup)
+    $('#next_panel').on('touchstart', speedHdown).on('touchend',speedHup )
 
-    $('#speedS').mousedown(speedSdown).mouseup(speedSup)
+    $('#speedS').on('touchstart', speedSdown).on('touchend', speedSup)
+
     $('#start').mousedown(start)
     $('#end').mousedown(end)
 
-    $('#getary').mousedown(function (e) {
-        console.log(defin_field);
-    });
+    
 
     $('html').keydown(function (e) {
 
@@ -37,8 +37,16 @@ $(function () {
             case 65: // Key[a]
                 leftdown();
                 break;
+            
+            case 37: //key[<-]
+                leftdown();
+                break;
 
             case 68: // Key[d]
+                rightdown();
+                break;
+            
+            case 39: //key[->]
                 rightdown();
                 break;
 
@@ -61,15 +69,31 @@ $(function () {
                 leftup();
                 break;
 
+            case 37: //key[<-]
+                leftup();
+                break;
+
             case 68: // Key[d]
+                rightup();
+                break;
+
+            case 39: //key[->]
                 rightup();
                 break;
 
             case 81: // Key[q]
                 rotateL();
                 break;
+            
+            case 90: //key[z]
+                rotateL();
+                break;
 
             case 69: // Key[e]
+                rotateR();
+                break;
+
+            case 88: //key[x]
                 rotateR();
                 break;
 
@@ -87,6 +111,7 @@ $(function () {
         }
     });
     function rotateL() {
+        if (!isFall) return;
         rotate = 0;
         if (coord.rotate != 0) {
             rotate = coord.rotate - 90;
@@ -118,6 +143,7 @@ $(function () {
     }
 
     function rotateR() {
+        if (!isFall) return;
         rotate = 0;
         if (coord.rotate != 270) {
             rotate = coord.rotate + 90;
@@ -145,6 +171,7 @@ $(function () {
     }
 
     function leftdown() {
+        if (!isFall) return;
         if(timerId1 != null){
             clearTimeout(timerId1);
             timerId1 = null
@@ -173,6 +200,7 @@ $(function () {
     }
 
     function leftup() {
+        if (!isFall) return;
         if(timerId1 != null){
             clearTimeout(timerId1);
             timerId1 = null
@@ -181,6 +209,7 @@ $(function () {
     }
 
     function rightdown() {
+        if (!isFall) return;
         if(timerId2 != null){
             clearTimeout(timerId2);
             timerId2 = null;
@@ -210,6 +239,7 @@ $(function () {
     }
 
     function rightup() {
+        if (!isFall) return;
         if(timerId2 != null){
             clearTimeout(timerId2);
             timerId2 = null;
@@ -218,6 +248,7 @@ $(function () {
     }
 
     function hold() {
+        if (!isFall) return;
         if (isHoldLock) return;
 
 
@@ -239,7 +270,11 @@ $(function () {
     
 
     const speedH = function () {
+        if (!isFall) return;
+        clearInterval(timerId3);
+        timerId3 = null;
         timerId3 = setInterval(function(){
+            tspin = null;
             while (!isConnect(0, 1, position.rotate)) {
                 fall_block();
             }
@@ -248,16 +283,19 @@ $(function () {
     }
 
     function speedHdown() {
-        if (timerId3 == null) {
+        if (!isFall) return;
+        if (timerId3 == null && isFall) {
             timerId3 = setTimeout(speedH, 1000);
             while (!isConnect(0, 1, position.rotate)) {
                 fall_block();
+                tspin = null;
             }
             fall_block(true);
         }
     }
 
     function speedHup() {
+        if (!isFall) return;
         clearInterval(timerId3);
         timerId3 = null;
 
@@ -265,6 +303,7 @@ $(function () {
 
     var s_key_down_cnt = 0;
     function speedSdown() {
+        if (!isFall) return;
         if (s_key_down_cnt > 20) {
             if (timerId4 != null) {
                 clearInterval(timerId4);
@@ -276,11 +315,13 @@ $(function () {
         clearInterval(IntervalId);
         if (!isConnect(0, 1) && timerId4 == null) {
             timerId4 = setInterval(fall_block, 20);
+            tspin = null;
         }
         s_key_down_cnt++;
     }
 
     function speedSup() {
+        if (!isFall) return;
         //他のキーが押されていない間だけ
         if(timerId1 == null && timerId2 == null){
             fall_block(true);
@@ -316,7 +357,7 @@ $(function () {
         count_line = 0;
         init_game_ui();
         set_hold_block();
-        $('#line').text(count_line + 'LINES');
+        $('#line').text(count_line + 'LINE');
         $('#level').text('0LEVEL');
         coord.x = 4, coord.y = 1, coord.rotate = 0;
         block_list = get_block_list();

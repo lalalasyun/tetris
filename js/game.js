@@ -309,7 +309,7 @@ function game_over() {
     if(gameover_dot_timer_ID == null){
         gameover_dot_timer_ID = setInterval(set_gameover_dot_timer, 500);
     }
-    
+    speedHup();
 }
 var gameover_time = 0;
 const set_gameover_dot_timer = function () {
@@ -349,7 +349,19 @@ function load() {
     set_move_block();
     set_dot(temp_dot.home);
 
+
+    var width = screen.width;
+    var height = screen.height;
+    var z = 1;
+    if(width < 680){
+        z = width / 650;
+        document.getElementById("ctr_btn").hidden = false;
+    }
+    document.getElementById("html").style.transform = "scale("+z+", "+z+")";
+    document.getElementById("html").style.height = width +"px";
+    document.getElementById("html").style.height = height +"px";
 }
+
 
 
 function get_fall_time(){
