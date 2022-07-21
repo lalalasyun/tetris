@@ -1,6 +1,6 @@
-
-<!DOCTYPE html >
+<!DOCTYPE html>
 <html id="html">
+
 <head>
     <meta charset="utf-8" name="viewport" content="width=device-width,user-scalable=no">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -81,32 +81,119 @@
         <span id="close" class="close-button">✕</span>
         <b>操作説明</b>
         <hr>
-        <p>左移動:A ← 右移動:D →</p>
-        <p>左回転:Q Z右回転:E X</p>
-        <p>ハードドロップ:SPACE</p>
-        <p>ソフトドロップ:S</p>
-        <p>ホールド:SHIFT</p>
-        
+        <table>
+            <tr>
+                <td colspan="2">
+                    <h3>PC</h3>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p>左移動:A,←</p>
+                </td>
+                <td>
+                    <p>右移動:D,→</p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p>左回転:Q,Z</p>
+                </td>
+                <td>
+                    <p>右回転:E,X</p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p>ハードドロップ</p>
+                </td>
+                <td>
+                    <p>:SPACE</p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p>ソフトドロップ</p>
+                </td>
+                <td>
+                    <p>:S</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <p>ホールド</p>
+                </td>
+                <td>
+                    <p>:SHIFT</p>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <h3>スマートフォン</h3>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p>ゲームスタート</p>
+                </td>
+                <td>
+                    <p>:画面中央のSTARTを押す</p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p>ゲーム終了</p>
+                </td>
+                <td>
+                    <p>:画面中央のRESETを押す</p>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <p>各種操作</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="2">
+                    <p>画面下のコントローラーを操作</p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p>ソフトドロップ</p>
+                </td>
+                <td>
+                    <p>:ドロップ長押し</p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p>ホールド</p>
+                </td>
+                <td>
+                    <p>:ドロップを上フリック</p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p>ホールド</p>
+                </td>
+                <td>
+                    <p>:ドロップを上フリック</p>
+                </td>
+            </tr>
+
+        </table>
+
+
     </div>
-    <table class="game_button1" id="ctr_btn" hidden>
-        <tr>
-            <td><button id="rotateL">左回転</button></td>
-            <td><button></button></td>
-            <td><button id="rotateR">右回転</button></td>
-            
-        </tr>
-        <tr>
-            <td><button id="left">左移動</button></td>
-            <td><button></button></td>
-            <td><button id="right">右移動</button></td>
-            
-        </tr>
-        
-        <tr>
-            <td colspan="3"><button id="speedS">ソフトドロップ</button></td>
-        </tr>
-    </table>
-    <table class="game_button2">
+    <div>
+        <p id="endstart" class="btn-endstart" ></p>
+    </div>
+
+    <table class="game_button2" id="ctr_btn2">
         <tr>
             <td>
                 <a id="start" class="btn btn--yellow btn--cubic">　開始　</a>
@@ -120,6 +207,22 @@
         </tr>
     </table>
 
+    <table class="game_button1" id="ctr_btn1" hidden>
+        <tr>
+            <td><button id="rotateL">左回転</button></td>
+            <td><button id="rotateR">右回転</button></td>
+
+        </tr>
+        <tr>
+            <td><button id="left">左移動</button></td>
+            <td><button id="right">右移動</button></td>
+
+        </tr>
+
+        <tr>
+            <td colspan="2"><button id="drop">ドロップ</button></td>
+        </tr>
+    </table>
 </body>
 
 </html>

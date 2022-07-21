@@ -16,17 +16,29 @@ $(function () {
 
     $('#right').on('touchstart', rightdown).on('touchend', rightup);
 
-    $('#hold_panel').on('touchstart', hold)
+    $('#hold').on('touchstart', hold)
 
-    $('#rotateL').mousedown(rotateL)
-    $('#rotateR').mousedown(rotateR)
+    $('#rotateL').on('touchstart', rotateL)
+    $('#rotateR').on('touchstart', rotateR)
 
-    $('#next_panel').on('touchstart', speedHdown).on('touchend',speedHup )
+    $('#speedH').on('touchstart', speedHdown).on('touchend',speedHup )
 
     $('#speedS').on('touchstart', speedSdown).on('touchend', speedSup)
 
     $('#start').mousedown(start)
     $('#end').mousedown(end)
+
+    $('#endstart').mousedown(function(){
+        if(isGame && !isFall){
+            end();
+        }else{
+            if (!isGame) {
+                start();
+            }
+        }
+
+        
+    })
 
     
 
@@ -323,9 +335,7 @@ $(function () {
     function speedSup() {
         if (!isFall) return;
         //他のキーが押されていない間だけ
-        if(timerId1 == null && timerId2 == null){
-            fall_block(true);
-        }
+        
         
 
         clearInterval(timerId4);
@@ -341,8 +351,6 @@ $(function () {
     
     function start() {
         if (isGame) return;
-        
-
         //確定済みフィールド[10,23]
         defin_field = init_field();
 
@@ -425,13 +433,130 @@ $(function () {
 
     }
 
+//スワイプ処理
+    /** ②指が触れたか検知 */
+	$("#drop").on("touchstart", start_check);
+
+	/** ③指が動いたか検知 */
+	$("#drop").on("touchmove", move_check);
+
+	/** ④指が離れたか検知 */
+	$("#drop").on("touchend", end_check);
+
+	/** 変数宣言 */
+	var moveY,moveX, posiY, posiX;
+
+
+	// ⑤タッチ開始時の処理
+	function start_check(event) 
+	{
+        speedSdown();
+
+		/** 現在の座標取得 */
+		posiY = getY(event);
+		posiX = getX(event);
+
+		/** 移動距離状態を初期化 */
+		moveY = '';
+		moveX = '';
+
+		/** 表示メッセージを初期化 */
+		msgY = '';
+		msgX = '';
+	}
+
+	// ⑥スワイプ中の処理
+	function move_check(event)
+	{
+        speedSup();
+
+		if (posiX - getX(event) > 70) // 70px以上移動でスワイプと判断
+		{
+			/** 右→左と判断 */
+			moveX = "left";
+		}
+		else if (posiX - getX(event) < -70)  // 70px以上移動でスワイプと判断
+		{
+			/** 左→右と判断 */			
+			moveX = "right";
+		}
+
+		if (posiY - getY(event) > 70) // 70px以上移動でスワイプと判断
+		{
+			/** 下→上と判断 */
+			moveY = "top";
+		}
+		else if (posiY - getY(event) < -70)  // 70px以上移動でスワイプと判断
+		{
+			/** 上→下と判断 */			
+			moveY = "bottom";
+		}
+	}
+
+	// ⑦指が離れた時の処理
+	function end_check(event)
+	{
+        speedSup();
+
+		if (moveX == "left")
+		{
+			msgX = "左へ移動";
+		}
+		else if (moveX == "right")
+		{
+			msgX = "右へ移動";
+		}
+		else
+		{
+			msgX = "移動なし";
+		}
+
+
+		if (moveY == "top")
+		{
+			msgY = "上へ移動";
+            hold();
+		}
+		else if (moveY == "bottom")
+		{
+			msgY = "下へ移動";
+            speedHdown();
+            speedHup();
+		}
+		else
+		{
+			msgY = "移動なし";
+		}
+
+        console.log(msgY);
+
+	}
+
+
+	// 座標取得処理
+	function getY(event) 
+	{
+		//縦方向の座標を取得
+		return (event.originalEvent.touches[0].pageY);
+	}
+
+	function getX(event) 
+	{
+		//横方向の座標を取得
+		return (event.originalEvent.touches[0].pageX);
+	}
+
+
+
+
     //jQuery Simple Modal Example
+    
 
     $('#edit').click(function () {
         $('#cover, #modal').fadeTo(200, 1);
     });
 
-    $('#close, #cover').click(function () {
+    $('#close').click(function () {
         $('#cover, #modal').fadeTo(200, 0).hide();
     });
 

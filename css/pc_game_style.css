@@ -16,9 +16,7 @@ body {
 
 table.game_button1{
   position: absolute;
-  bottom:657px;
-  left: 145px;
-  
+  left :0px;
 }
 table.game_button2{
   position: absolute;
@@ -26,15 +24,28 @@ table.game_button2{
   width: 440px;
 }
 button{
-  width: 130px;
-  height: 50px;
-  background: transparent;
-  border: none;
-  color :aqua;
+  width: 318px;
+  height: 100px;
+  font-size: 1.6rem;
+  font-weight: 700;
+
 }
-#speedS{
-  width: 400px;
-  height: 50px;
+#drop{
+  width: 640px;
+  height: 100px;
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+
+.btn-endstart{
+  position: absolute;
+  left: 240px;
+  top :300px;
+  width: 250px;
+  height: 500px;
+  border: none;
+  background: transparent;
 }
 
 a.btn{
@@ -109,11 +120,13 @@ td.game_panel_class {
 
 
 #modal {
+  font-size: 1.2rem;
+  font-weight: 700;
   position: absolute;
-  width: 200px;
+  width: 600px;
   height: auto;
-  top:300px;
-  left: 250px;
+  top:100px;
+  left: 20px;
   background: rgb(114, 100, 100);
   border-radius: 5px;
   z-index: 2;

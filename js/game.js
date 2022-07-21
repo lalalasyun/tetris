@@ -309,11 +309,14 @@ function game_over() {
     if(gameover_dot_timer_ID == null){
         gameover_dot_timer_ID = setInterval(set_gameover_dot_timer, 500);
     }
-    speedHup();
+    clearInterval(timerId3);
+    timerId3 = null;
 }
+
 var gameover_time = 0;
 const set_gameover_dot_timer = function () {
     context4.clearRect(0, 400, game_ui.width, game_ui.height);
+    set_dot(temp_dot.end);
     if (gameover_time % 2 == 1) {
         set_dot(temp_dot.press_M);
     }
@@ -355,11 +358,21 @@ function load() {
     var z = 1;
     if(width < 680){
         z = width / 650;
-        document.getElementById("ctr_btn").hidden = false;
+        document.getElementById("ctr_btn1").hidden = false;
+        document.getElementById("ctr_btn2").hidden = true;
+
+        document.getElementById("html").style.transform = "scale("+z+", "+z+")";
+        document.getElementById("html").style.width = width +"px";
+        document.getElementById("html").style.height = height +"px";
+
+        document.getElementById("ctr_btn1").style.top = (screen.height / z)-320 +"px";
+
+        
+        $('#edit').click()
     }
-    document.getElementById("html").style.transform = "scale("+z+", "+z+")";
-    document.getElementById("html").style.height = width +"px";
-    document.getElementById("html").style.height = height +"px";
+    
+
+    
 }
 
 
