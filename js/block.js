@@ -67,7 +67,8 @@ function definition_block(d) {
 
     level = Math.floor(count_line/10);
 
-    init_game_ui();
+    if(!isPause) init_game_ui();
+    
     clearInterval(dot_timer_Id);
     if(cnt > 0){
         ren_count++;
@@ -90,11 +91,9 @@ function definition_block(d) {
 
     if (isLine10(count_line)) set_levelup();
     
-    
-    
-
     dot_timer_Id = setTimeout(() => {
-        init_game_ui();
+        if(!isPause)  init_game_ui();
+       
     }, 1000);
 
 

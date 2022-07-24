@@ -10,43 +10,169 @@
   height: 10px;
 }
 
-body {
-  background-color: rgba(14, 9, 9, 0.819);
+.game_button1{
+  width: 100%;
+  height:500px;
+  opacity:0;
 }
 
-table.game_button1{
-  position: absolute;
-  left :0px;
+.game_button1 td{
+  font-size: 1.6rem;
+  font-weight: 700;
+  background-color: #999;
+  text-align: center;
+  vertical-align: middle;
 }
+
+.game_button1 #rotateL,#rotateR{
+  width: 20%;
+}
+
+.game_button1 #drop {
+  width: 60%;
+}
+
+
+
 table.game_button2{
   position: absolute;
-  left: 134px;
+  left: 125px;
   width: 440px;
 }
-button{
-  width: 318px;
-  height: 100px;
-  font-size: 1.6rem;
-  font-weight: 700;
 
-}
-#drop{
-  width: 640px;
-  height: 100px;
-  font-size: 1.6rem;
-  font-weight: 700;
-}
+/*start*/
 
-
-.btn-endstart{
-  position: absolute;
-  left: 240px;
-  top :300px;
-  width: 250px;
-  height: 500px;
+#endstart_box.div,#pause_box.div,#end_box.div{
   border: none;
   background: transparent;
 }
+
+#endstart_box .start{
+  position: absolute;
+  left: 100px;
+  top :400px;
+  width: 220px;
+  height: 50px;
+}
+
+#endstart_box .option{
+  position: absolute;
+  left: 100px;
+  top :520px;
+  width: 220px;
+  height: 50px;
+}
+/*------*/
+
+/*pause*/
+
+.restart{
+  position: absolute;
+  left: 100px;
+  top :400px;
+  width: 220px;
+  height: 50px;
+}
+
+
+#pause_box .option{
+  position: absolute;
+  left: 100px;
+  top :520px;
+  width: 220px;
+  height: 50px;
+}
+
+.quit{
+  position: absolute;
+  left: 70px;
+  top :650px;
+  width: 290px;
+  height: 50px;
+}
+/*------*/
+
+/*end*/
+#end_box .end{
+  position: absolute;
+  left: 100px;
+  top :490px;
+  width: 220px;
+  height: 50px;
+}
+
+#end_box .option{
+  position: absolute;
+  left: 100px;
+  top :610px;
+  width: 220px;
+  height: 50px;
+}
+/*------*/
+
+/*ポーズボタン*/
+.openbtn1_block{
+  padding: 10px;
+}
+
+.openbtn1{
+  position: relative;
+  background:#57a2c7;
+  cursor: pointer;
+    width: 50px;
+    height:50px;
+  border-radius: 100%;
+  margin: 0 0 0 auto;
+}
+
+.openbtn1 span{
+    display: inline-block;
+    transition: all .4s;
+    position: absolute;
+    left: 14px;
+    height: 3px;
+    border-radius: 2px;
+  background: #fff;
+    width: 45%;
+  }
+
+.openbtn1 span:nth-of-type(1) {
+  top:15px; 
+}
+
+.openbtn1 span:nth-of-type(2) {
+  top:23px;
+}
+
+.openbtn1 span:nth-of-type(3) {
+  top:31px;
+}
+
+.openbtn1.active span:nth-of-type(1) {
+    top: 18px;
+    left: 18px;
+    transform: translateY(6px) rotate(-45deg);
+    width: 30%;
+}
+
+.openbtn1.active span:nth-of-type(2) {
+  opacity: 0;
+}
+
+.openbtn1.active span:nth-of-type(3){
+    top: 30px;
+    left: 18px;
+    transform: translateY(-6px) rotate(45deg);
+    width: 30%;
+}
+
+.btn-block{
+  width:200px;  
+  padding: 30px;
+}
+
+/*------------*/
+
 
 a.btn{
   font-size: 1.6rem;
@@ -83,27 +209,38 @@ a.btn--yellow:hover {
   border-bottom: 2px solid gray;
 }
 
-
+.main_table{
+  border-spacing:0;
+}
 
 
 #game_panel {
   background-color: aqua;
   padding: 10px;
   border-radius: 0px 0px 10px 10px;
+  filter: drop-shadow( 10px 10px 5px rgba(0, 0, 0, 0.5));
+  backdrop-filter: blur(12px);
+
+}
+
+#pose_panel{
+  background-color: aqua;
 }
 
 #hold_panel {
   background-color: aqua;
   padding: 10px;
   border-radius: 10px 0px 0px 10px;
-  margin-right: -2px;
+  filter: drop-shadow( 10px 10px 5px rgba(0, 0, 0, 0.5));
+
 }
 
 #next_panel {
   background-color: aqua;
   padding: 10px;
   border-radius: 0px 10px 10px 0px;
-  margin-left: -2px;
+  filter: drop-shadow( 10px 10px 5px rgba(0, 0, 0, 0.5));
+
 }
 
 p.line {
@@ -118,14 +255,14 @@ td.game_panel_class {
   padding: 0px;
 }
 
-
+/*モーダルウィンドウ*/
 #modal {
   font-size: 1.2rem;
   font-weight: 700;
   position: absolute;
   width: 600px;
   height: auto;
-  top:100px;
+  top:300px;
   left: 20px;
   background: rgb(114, 100, 100);
   border-radius: 5px;
@@ -134,18 +271,32 @@ td.game_panel_class {
   box-shadow: 0 0 60px 10px rgba(0, 0, 0, 0.9);
 }
 
-.close-button {
+.close-button{
   position: absolute;
-  z-index: 1;
   top: 5px;
   right: 20px;
-  border: 0;
-  background: black;
-  color: white;
-  padding: 5px 10px;
-  font-size: 1px;
-  border-radius: 3px;
-  }
+  z-index: 1;
+  font-size: 100%;/*ボタンの大きさ*/
+  font-weight: bold;
+  border: 1px solid #999;
+  color: #999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 100%;
+  width: 1.3em;
+  line-height: 1.3em;
+  cursor: pointer;
+  transition: .2s;
+}
+  
+.close-button:hover{
+  background: #333;
+  border-color: #333;
+  color: #FFF;
+}
+
+
 
 /*
   canvasをレイヤーとして使う
@@ -155,8 +306,7 @@ td.game_panel_class {
 #game_base,
 #game_effect {
   position: absolute;
-  left: 148px;
-  top: 20px;
+  top: 10px;
 
 }
 
@@ -177,6 +327,26 @@ canvas {
   border-radius: 5px;
 }
 
-html{
+#game_main{
+  margin: 0px;
+  padding: 0px;
   transform-origin: left top;
 }
+
+body {
+  margin: 0px;
+  padding: 0px;
+
+  background-color: rgba(14, 9, 9, 0.819);
+}
+
+header{
+  width: 100%;
+}
+
+footer{
+  position: fixed;
+  width: 100%;
+  bottom: 0px;
+}
+

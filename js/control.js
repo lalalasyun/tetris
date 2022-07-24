@@ -1,11 +1,12 @@
 let IntervalId = 0;
 let isHardDrop = false;
 let isHoldLock = false;
+let isPause = false;
 
 /// 長押しを検知する閾値
 const LONGPRESS = 50;
 /// 長押し実行タイマーのID
-let timerId1, timerId2, timerId3, timerId4,timerId5;
+let timerId1, timerId2, timerId3, timerId4, timerId5;
 
 $(function () {
 
@@ -21,26 +22,24 @@ $(function () {
     $('#rotateL').on('touchstart', rotateL)
     $('#rotateR').on('touchstart', rotateR)
 
-    $('#speedH').on('touchstart', speedHdown).on('touchend',speedHup )
+    $('#speedH').on('touchstart', speedHdown).on('touchend', speedHup)
 
     $('#speedS').on('touchstart', speedSdown).on('touchend', speedSup)
 
     $('#start').mousedown(start)
     $('#end').mousedown(end)
 
-    $('#endstart').mousedown(function(){
-        if(isGame && !isFall){
-            end();
-        }else{
-            if (!isGame) {
-                start();
-            }
-        }
-
-        
+    $('.quit').mousedown(end)
+    $('.restart').mousedown(pause)
+    $('.option').mousedown(function(){
+        $('#modal').fadeTo(200, 1);
     })
+    $('.start').mousedown(start)
+    $('.end').mousedown(end)
 
-    
+    $('#footer').mousedown(handle);
+
+
 
     $('html').keydown(function (e) {
 
@@ -49,7 +48,7 @@ $(function () {
             case 65: // Key[a]
                 leftdown();
                 break;
-            
+
             case 37: //key[<-]
                 leftdown();
                 break;
@@ -57,7 +56,7 @@ $(function () {
             case 68: // Key[d]
                 rightdown();
                 break;
-            
+
             case 39: //key[->]
                 rightdown();
                 break;
@@ -75,6 +74,7 @@ $(function () {
     $('html').keyup(function (e) {
         if (e.which == 13) start();
         if (e.which == 77) end();
+        if(e.which == 27)pause();
         if (!isFall) return;
         switch (e.which) {
             case 65: // Key[a]
@@ -96,7 +96,7 @@ $(function () {
             case 81: // Key[q]
                 rotateL();
                 break;
-            
+
             case 90: //key[z]
                 rotateL();
                 break;
@@ -122,7 +122,11 @@ $(function () {
                 break;
         }
     });
-    function rotateL() {
+
+
+
+    function rotateL(event) {
+        handle(event);
         if (!isFall) return;
         rotate = 0;
         if (coord.rotate != 0) {
@@ -134,8 +138,8 @@ $(function () {
         d = super_rotation(coord.rotate, rotate);
         if (d == null) return;
 
-        
-        
+
+
 
         //lockdown_cntを増やす
         lockdown_cnt++;
@@ -154,7 +158,8 @@ $(function () {
         }
     }
 
-    function rotateR() {
+    function rotateR(event) {
+        handle(event);
         if (!isFall) return;
         rotate = 0;
         if (coord.rotate != 270) {
@@ -164,7 +169,7 @@ $(function () {
         }
         d = super_rotation(coord.rotate, rotate);
         if (d == null) return;
-        
+
         //lockdown_cntを増やす
         lockdown_cnt++;
 
@@ -182,80 +187,103 @@ $(function () {
         }
     }
 
-    function leftdown() {
+    function leftdown(event) {
+        handle(event);
         if (!isFall) return;
-        if(timerId1 != null){
+        if (timerId1 != null) {
             clearTimeout(timerId1);
             timerId1 = null
         }
-        if(timerId2 != null){
+        if (timerId2 != null) {
             clearTimeout(timerId2);
             timerId2 = null;
         }
-        
+
         timerId1 = setInterval(function () {
 
-            if (isConnect(-1, 0)) {
-                clearTimeout(this);
-                return;
-            }
-            //lockdown_cntを増やす
-            lockdown_cnt++;
-
-            coord.x--;
-            tspin = null;
-
-            init_game();
-            set_block_field();
+            move_left();
         }, LONGPRESS);
 
     }
+
+    //左に1動かす
+    var move_left = function () {
+        if (isConnect(-1, 0)) {
+            clearTimeout(this);
+            return;
+        }
+        //lockdown_cntを増やす
+        lockdown_cnt++;
+
+        coord.x--;
+        tspin = null;
+
+        init_game();
+        set_block_field();
+    }
+
+
 
     function leftup() {
         if (!isFall) return;
-        if(timerId1 != null){
+        if (timerId1 != null) {
             clearTimeout(timerId1);
-            timerId1 = null
+            timerId1 = null;
+
+        } else {
+            move_left;
         }
-        
+
+
     }
 
-    function rightdown() {
+    function rightdown(event) {
+        handle(event);
         if (!isFall) return;
-        if(timerId2 != null){
+        if (timerId2 != null) {
             clearTimeout(timerId2);
             timerId2 = null;
         }
-        if(timerId1 != null){
+        if (timerId1 != null) {
             clearTimeout(timerId1);
             timerId1 = null
         }
-        
+
         timerId2 = setInterval(function () {
 
-            b = position.block[position.rotate];
-
-            if (isConnect(1, 0)) {
-                clearTimeout(this);
-                return;
-            }
-            //lockdown_cntを増やす
-            lockdown_cnt++;
-
-            coord.x++;
-            tspin = null;
-
-            init_game();
-            set_block_field();
+            move_right();
         }, LONGPRESS);
     }
 
+    //右に1動かす
+    var move_right = function () {
+        b = position.block[position.rotate];
+
+        if (isConnect(1, 0)) {
+            clearTimeout(this);
+            return;
+        }
+        //lockdown_cntを増やす
+        lockdown_cnt++;
+
+        coord.x++;
+        tspin = null;
+
+        init_game();
+        set_block_field();
+    }
+
+
     function rightup() {
         if (!isFall) return;
-        if(timerId2 != null){
+        if (timerId2 != null) {
             clearTimeout(timerId2);
             timerId2 = null;
+
+        } else {
+            move_right();
         }
+
 
     }
 
@@ -279,19 +307,19 @@ $(function () {
         set_hold_block();
         isHoldLock = true;
     }
-    
+
 
     const speedH = function () {
         if (!isFall) return;
         clearInterval(timerId3);
         timerId3 = null;
-        timerId3 = setInterval(function(){
+        timerId3 = setInterval(function () {
             tspin = null;
             while (!isConnect(0, 1, position.rotate)) {
                 fall_block();
             }
             fall_block(true);
-        },300);
+        }, 300);
     }
 
     function speedHdown() {
@@ -335,8 +363,8 @@ $(function () {
     function speedSup() {
         if (!isFall) return;
         //他のキーが押されていない間だけ
-        
-        
+
+
 
         clearInterval(timerId4);
         clearInterval(IntervalId);
@@ -348,9 +376,15 @@ $(function () {
 
     }
 
-    
+
     function start() {
         if (isGame) return;
+        if (isMobile) {
+            document.getElementById("ctr_btn1").hidden = false;
+            document.getElementById("openbtn1").hidden = false;
+        }
+        document.getElementById("endstart_box").hidden = true;
+
         //確定済みフィールド[10,23]
         defin_field = init_field();
 
@@ -363,6 +397,7 @@ $(function () {
         isFall = true;
         isGame = true;
         count_line = 0;
+        level = 0;
         init_game_ui();
         set_hold_block();
         $('#line').text(count_line + 'LINE');
@@ -378,21 +413,27 @@ $(function () {
 
     function end() {
         speedHup();
-        
+
+        document.getElementById("ctr_btn1").hidden = true;
+        document.getElementById("openbtn1").hidden = true;
+
+        document.getElementById("endstart_box").hidden = false;
+        document.getElementById("end_box").hidden = true;
+
         //操作フィールド[10,23]
         field = init_field();
 
         $('#mess').text('');
         clearInterval(IntervalId);
-        
+
 
         isFall = false;
         isGame = false;
         init_game();
         init_game_ui();
         set_dot(temp_dot.home);
-        
-        
+
+
 
         //hold
         isHoldLock = false;
@@ -419,7 +460,7 @@ $(function () {
         }
 
         //starttimerを止める
-        if(timerId5 != null){
+        if (timerId5 != null) {
             clearInterval(timerId5)
         }
 
@@ -429,135 +470,303 @@ $(function () {
         //back
         backtoback_count = 0;
 
+        //pause
+        isPause = false;
+
         set_dot(temp_dot.home);
 
     }
 
-//スワイプ処理
+    function pause(){
+        //落下を止める
+        if (isGame || isPause) {
+            if (!isPause) {
+                document.getElementById("pause_box").hidden = false;
+                clearInterval(IntervalId);
+                init_game_ui();
+                
+                context4.fillStyle = get_rgba('grey', 0.2, 1);
+                context4.fillRect(0, 0, game_ui.width, game_ui.height);
+                set_dot(temp_dot.pause);
+
+                isFall = false;
+                isPause = true;
+            } else {
+                document.getElementById("pause_box").hidden = true;
+                init_game_ui();
+                IntervalId = setInterval(fall_block, get_fall_time());
+                isFall = true;
+                isPause = false;
+            }
+            
+        }
+    }
+
+    //スワイプ処理
     /** ②指が触れたか検知 */
-	$("#drop").on("touchstart", start_check);
+    $("#drop").on("touchstart", start_check);
 
-	/** ③指が動いたか検知 */
-	$("#drop").on("touchmove", move_check);
+    /** ③指が動いたか検知 */
+    $("#drop").on("touchmove", move_check);
 
-	/** ④指が離れたか検知 */
-	$("#drop").on("touchend", end_check);
+    /** ④指が離れたか検知 */
+    $("#drop").on("touchend", end_check);
 
-	/** 変数宣言 */
-	var moveY,moveX, posiY, posiX;
+    /** 変数宣言 */
+    var moveY1, moveX1, moveY2, moveX2, posiY, posiX, countX1, countY1;
 
-
-	// ⑤タッチ開始時の処理
-	function start_check(event) 
-	{
-        speedSdown();
-
-		/** 現在の座標取得 */
-		posiY = getY(event);
-		posiX = getX(event);
-
-		/** 移動距離状態を初期化 */
-		moveY = '';
-		moveX = '';
-
-		/** 表示メッセージを初期化 */
-		msgY = '';
-		msgX = '';
-	}
-
-	// ⑥スワイプ中の処理
-	function move_check(event)
-	{
-        speedSup();
-
-		if (posiX - getX(event) > 70) // 70px以上移動でスワイプと判断
-		{
-			/** 右→左と判断 */
-			moveX = "left";
-		}
-		else if (posiX - getX(event) < -70)  // 70px以上移動でスワイプと判断
-		{
-			/** 左→右と判断 */			
-			moveX = "right";
-		}
-
-		if (posiY - getY(event) > 70) // 70px以上移動でスワイプと判断
-		{
-			/** 下→上と判断 */
-			moveY = "top";
-		}
-		else if (posiY - getY(event) < -70)  // 70px以上移動でスワイプと判断
-		{
-			/** 上→下と判断 */			
-			moveY = "bottom";
-		}
-	}
-
-	// ⑦指が離れた時の処理
-	function end_check(event)
-	{
-        speedSup();
-
-		if (moveX == "left")
-		{
-			msgX = "左へ移動";
-		}
-		else if (moveX == "right")
-		{
-			msgX = "右へ移動";
-		}
-		else
-		{
-			msgX = "移動なし";
-		}
+    //ダブルタップ用の時間
+    var time = 0;
 
 
-		if (moveY == "top")
-		{
-			msgY = "上へ移動";
-            hold();
-		}
-		else if (moveY == "bottom")
-		{
-			msgY = "下へ移動";
-            speedHdown();
-            speedHup();
-		}
-		else
-		{
-			msgY = "移動なし";
-		}
+    // ⑤タッチ開始時の処理
+    function start_check(event) {
+        handle(event);
+        if (!isFall) return;
+        now_time = new Date();
+        time_diff = now_time - time;
 
-        console.log(msgY);
+        /** 現在の座標取得 */
+        posiY = getY(event);
+        posiX = getX(event);
 
-	}
+        //ダブルタップ
+        if (time_diff < 200 && coord.y > 1) {
+            while (!isConnect(0, 1, position.rotate)) {
+                fall_block();
+                tspin = null;
+            }
+            fall_block(true);
+            return;
+        }
+
+        time = now_time;
 
 
-	// 座標取得処理
-	function getY(event) 
-	{
-		//縦方向の座標を取得
-		return (event.originalEvent.touches[0].pageY);
-	}
+        console.log(posiY, posiX)
 
-	function getX(event) 
-	{
-		//横方向の座標を取得
-		return (event.originalEvent.touches[0].pageX);
-	}
+        /** 移動距離状態を初期化 */
+        moveY2 = '';
+        moveX2 = '';
+
+        countX1 = 0;
+        countY1 = 0;
+
+        /** 表示メッセージを初期化 */
+        msgY = '';
+        msgX = '';
+    }
+
+    // スワイプの標準イベントを発生させない
+    function handle(event) {
+        if (event == null) return;
+        event.preventDefault();
+    }
+
+    // ⑥スワイプ中の処理
+    function move_check(event) {
+        handle(event);
+        if (!isGame) false;
+
+        limitX = 15;
+        limitY = 50;
+
+        var countX2 = Math.floor(Math.abs((posiX - getX(event)) / limitX));
+        var countY2 = Math.floor(Math.abs((posiY - getY(event)) / limitY));
+
+        if (posiX - getX(event) > limitX) // limitXpx以上移動でスワイプと判断
+        {
+            /** 右→左と判断 */
+            moveX2 = "left";
+
+        }
+        else if (posiX - getX(event) < -limitX)  // limitXpx以上移動でスワイプと判断
+        {
+            /** 左→右と判断 */
+            moveX2 = "right";
+        }
+
+        if (posiY - getY(event) > limitY) // limitYpx以上移動でスワイプと判断
+        {
+            /** 下→上と判断 */
+            moveY2 = "top";
+
+        }
+        else if (posiY - getY(event) < -limitY)  // limitYpx以上移動でスワイプと判断
+        {
+            /** 上→下と判断 */
+            moveY2 = "bottom";
+        }
+
+        if (countX1 < countX2) {
+            countX1 = countX2;
+            moveX1 = moveX2;
+
+            posiX = getX(event);
+
+            end_check(null, countX1, 0);
+        }
+
+        if (countY1 < countY2) {
+            countY1 = countY2;
+            moveY1 = moveY2;
+
+            posiY = getY(event);
+            end_check(null, 0, countY1);
+
+        }
+
+
+        if (moveY1 != moveY2 || moveX1 != moveX2) {
+            countX1 = 0;
+            countY1 = 0;
+        }
+
+    }
+
+    // ⑦指が離れた時の処理
+    function end_check(event, x, y) {
+        handle(event);
+        if (!isGame) false;
+        console.log(msgX, msgY);
+        console.log(x, y);
+
+        if (timerId4 != null) {
+            speedSup();
+        }
+
+
+
+        if (moveX2 == "left" && y == 0) {
+            msgX = "左へ移動";
+            for (i = 0; i < x; i++) {
+                move_left();
+            }
+
+        }
+        else if (moveX2 == "right" && y == 0) {
+            msgX = "右へ移動";
+            for (i = 0; i < x; i++) {
+                move_right();
+            }
+
+        }
+        else {
+            msgX = "移動なし";
+
+        }
+
+
+        if (moveY2 == "top") {
+            msgY = "上へ移動";
+            now_time = new Date();
+            time_diff = now_time - time;
+            if (time_diff > 50) {
+                hold();
+            }
+
+
+        }
+        else if (moveY2 == "bottom" && x == 0) {
+
+            msgY = "下へ移動";
+            speedSdown();
+        }
+        else {
+            msgY = "移動なし";
+        }
+
+    }
+
+
+    // 座標取得処理
+    function getY(event) {
+        //縦方向の座標を取得
+        return (event.originalEvent.touches[0].pageY);
+    }
+
+    function getX(event) {
+        //横方向の座標を取得
+        return (event.originalEvent.touches[0].pageX);
+    }
 
 
 
 
     //jQuery Simple Modal Example
-    
+
 
     $('#edit').click(function () {
-        $('#cover, #modal').fadeTo(200, 1);
+        $('#modal').fadeTo(200, 1);
     });
 
     $('#close').click(function () {
-        $('#cover, #modal').fadeTo(200, 0).hide();
+        $('#modal').fadeTo(200, 0).hide();
+        // if(isMobile){
+        //     var ele = document.documentElement;
+        //     ele.requestFullscreen();
+        // }
+
     });
+
+    
+    //ポーズ
+    $(".openbtn1").click(function () {
+        $(this).toggleClass('active');
+
+        pause();
+        
+    });
+
+
+
+    //画面の回転を検知
+    var isReverse = false;  //正面が逆かどうかのフラグを用意しておく
+
+    if (navigator.userAgent.indexOf('Android') > 0) {
+        //Androidなら正面設定を確認
+        var orientation = screen.orientation || screen.mozOrientation || screen.msOrientation;
+        if (orientation.type === "portrait-secondary" || orientation.type === "landscape-primary") {
+            isReverse = true;
+        }
+    }
+
+    $(window).on("orientationchange", function () {
+        if (isReverse) {
+            orientCheckReverse();  //正面が逆の場合
+        } else {
+            orientCheck();  //正面が通常の場合
+        }
+    });
+
+    var result;
+    //正面設定が通常の場合の縦横判定処理
+    function orientCheck() {
+        if (isGame) return;
+        var orientation = window.orientation;
+        if (orientation === 0) {
+            /*  縦画面時の処理  */
+            window.location.reload();
+
+        } else {
+            /*  横画面時の処理  */
+            window.location.reload();
+
+        }
+    };
+
+    //正面設定が逆の場合の縦横判定処理
+    function orientCheckReverse() {
+        if (isGame) return;
+        var orientation = window.orientation;
+        if (orientation === 0) {
+            /*  横画面時の処理  */
+            window.location.reload();
+
+        } else {
+            /*  縦画面時の処理  */
+            window.location.reload();
+        }
+    };
 
 });

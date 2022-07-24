@@ -11,8 +11,10 @@ const collision_time = 500; //衝突が発生してから動かせる時間
 var isFall = false;
 var isGame = false;
 
+var isMobile = false; //スマートフォンかPCか
+
 //level
-var level = 1;
+var level = 0;
 
 //levelごとの速度
 const fall_speed = [1.0,0.793,0.618,0.473,0.355,0.262,0.190,0.135,0.094,0.064,0.043,0.028,0.018,0.011,0.007];
@@ -302,8 +304,11 @@ var coord = { x: 4, y: 0, block: [], rotate: 0 };
 var gameover_dot_timer_ID;
 function game_over() {
     init_game_ui();
+    context4.fillStyle = get_rgba('grey', 0.2, 1);
+    context4.fillRect(0, 0, game_ui.width, game_ui.height);
     set_dot(temp_dot.end);
     isFall = false;
+    isGame = false;
     clearInterval(timerId4);
     set_dot(temp_dot.press_M);
     if(gameover_dot_timer_ID == null){
@@ -311,11 +316,21 @@ function game_over() {
     }
     clearInterval(timerId3);
     timerId3 = null;
+
+    document.getElementById("ctr_btn1").hidden = true;
+    document.getElementById("openbtn1").hidden = true;
+
+    document.getElementById("endstart_box").hidden = true;
+    document.getElementById("end_box").hidden = false;
 }
 
 var gameover_time = 0;
 const set_gameover_dot_timer = function () {
-    context4.clearRect(0, 400, game_ui.width, game_ui.height);
+    init_game_ui();
+
+    context4.fillStyle = get_rgba('grey', 0.2, 1);
+    context4.fillRect(0, 0, game_ui.width, game_ui.height);
+
     set_dot(temp_dot.end);
     if (gameover_time % 2 == 1) {
         set_dot(temp_dot.press_M);
@@ -353,27 +368,40 @@ function load() {
     set_dot(temp_dot.home);
 
 
-    var width = screen.width;
-    var height = screen.height;
+    //画面のサイズに合わせて拡大縮小する
+    var width = screen.availWidth;
+    var height = screen.availHeight;
     var z = 1;
-    if(width < 680){
-        z = width / 650;
-        document.getElementById("ctr_btn1").hidden = false;
-        document.getElementById("ctr_btn2").hidden = true;
 
-        document.getElementById("html").style.transform = "scale("+z+", "+z+")";
-        document.getElementById("html").style.width = width +"px";
-        document.getElementById("html").style.height = height +"px";
-
-        document.getElementById("ctr_btn1").style.top = (screen.height / z)-320 +"px";
-
+   
+    if(width < 680 || height < 850){
+        if(width < 680){
+            z = width / 641;
+        }else{
+            z = height / 900;
+        }
         
-        $('#edit').click()
+        document.getElementById("ctr_btn1").hidden = true;
+        document.getElementById("ctr_btn2").hidden = true;
+        
+
+        const game_main_dom = document.getElementById("game_main").style;
+        game_main_dom.transform = "scale("+z+", "+z+")";
+        game_main_dom.width = width +"px";
+        game_main_dom.height = height +"px";
+
+        $('#modal').fadeTo(200, 1);
+
+        isMobile = true;
+    }else{
+        document.getElementById("modal").style.top = "150px";
     }
-    
 
     
 }
+
+
+
 
 
 
