@@ -49,7 +49,7 @@ function is_mobile()
 
                 </td>
                 <td class="game_panel_class" id="game_panel">
-                    <canvas width="400px" height="800px"></canvas>
+                    <canvas width="400px" height="820px"></canvas>
                     <div>
                         <canvas id="game_base" width="400px" height="800px"></canvas>
                         <canvas id="game" width="400px" height="800px"></canvas>
@@ -68,6 +68,9 @@ function is_mobile()
                     <div id="end_box" hidden>
                         <div class="end"></div>
                         <div class="option"></div>
+                    </div>
+                    <div id="score_box">
+                        <label id="score"></label>
                     </div>
                 </td>
                 <td class="game_panel_class">
@@ -95,21 +98,6 @@ function is_mobile()
                     </table>
                 </td>
 
-            </tr>
-            <tr>
-                <table class="game_button2" id="ctr_btn2">
-                    <tr>
-                        <td>
-                            <a id="start" class="btn btn--yellow btn--cubic">　開始　</a>
-                        </td>
-                        <td>
-                            <a id="end" class="btn btn--yellow btn--cubic">リセット</a>
-                        </td>
-                        <td>
-                            <a id="edit" class="btn btn--yellow btn--cubic">操作説明</a>
-                        </td>
-                    </tr>
-                </table>  
             </tr>
         </table>
 
@@ -250,15 +238,13 @@ function is_mobile()
                 </tr>
             </table>
 
-
+            
         </div>
     </div>
 
     
-
-
-    <footer id="footer">
-        <table class="game_button1" id="ctr_btn1" hidden>
+    <div id="controller">
+        <table class="game_button1" id="ctr_btn1">
             <tr>
                 <td id="rotateL">
                     <div></div>
@@ -271,7 +257,11 @@ function is_mobile()
                 </td>
             </tr>
         </table>
-        <div id="openbtn1"class="openbtn1_block" hidden>
+    </div>
+
+    <footer id="footer">
+        
+        <div id="openbtn1"class="openbtn1_block">
             <div class="openbtn1"><span></span><span></span><span></span>
         </div>
         

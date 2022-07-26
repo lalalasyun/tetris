@@ -31,7 +31,7 @@ $(function () {
 
     $('.quit').mousedown(end)
     $('.restart').mousedown(pause)
-    $('.option').mousedown(function(){
+    $('.option').mousedown(function () {
         $('#modal').fadeTo(200, 1);
     })
     $('.start').mousedown(start)
@@ -74,7 +74,7 @@ $(function () {
     $('html').keyup(function (e) {
         if (e.which == 13) start();
         if (e.which == 77) end();
-        if(e.which == 27)pause();
+        if (e.which == 27) pause();
         if (!isFall) return;
         switch (e.which) {
             case 65: // Key[a]
@@ -329,6 +329,7 @@ $(function () {
             while (!isConnect(0, 1, position.rotate)) {
                 fall_block();
                 tspin = null;
+                add_score(2);
             }
             fall_block(true);
         }
@@ -354,7 +355,7 @@ $(function () {
         }
         clearInterval(IntervalId);
         if (!isConnect(0, 1) && timerId4 == null) {
-            timerId4 = setInterval(fall_block, 20);
+            timerId4 = setInterval(fall_block, get_fall_time() / 20, false);
             tspin = null;
         }
         s_key_down_cnt++;
@@ -380,9 +381,18 @@ $(function () {
     function start() {
         if (isGame) return;
         if (isMobile) {
-            document.getElementById("ctr_btn1").hidden = false;
-            document.getElementById("openbtn1").hidden = false;
+
+            $("#openbtn1").show();
+
+            //pause
+            if (isPause) {
+                isPause = false;
+                $(".openbtn1").toggleClass('active');
+            }
+
         }
+        $('#controller').css('pointer-events', 'auto');
+
         document.getElementById("endstart_box").hidden = true;
 
         //確定済みフィールド[10,23]
@@ -402,24 +412,29 @@ $(function () {
         set_hold_block();
         $('#line').text(count_line + 'LINE');
         $('#level').text('0LEVEL');
-        coord.x = 4, coord.y = 1, coord.rotate = 0;
+        $('#score').text(zeroPadding(score));
+
+        coord.x = 4, coord.y = 2, coord.rotate = 0;
         block_list = get_block_list();
 
         set_next_block();
         coord.block = block_dict[get_block()];
         clearInterval(IntervalId);
         IntervalId = setInterval(fall_block, get_fall_time());
+
+        init_game();
+        set_block_field();
     }
 
     function end() {
         speedHup();
+        $("#openbtn1").hide();
 
-        document.getElementById("ctr_btn1").hidden = true;
-        document.getElementById("openbtn1").hidden = true;
         document.getElementById("pause_box").hidden = true;
 
         document.getElementById("endstart_box").hidden = false;
         document.getElementById("end_box").hidden = true;
+
 
         //操作フィールド[10,23]
         field = init_field();
@@ -472,24 +487,30 @@ $(function () {
         backtoback_count = 0;
 
         //pause
-        if(isPause){
+        if (isPause) {
             isPause = false;
             $(".openbtn1").toggleClass('active');
         }
 
         set_dot(temp_dot.home);
 
+
+        //score
+        score = 0;
+
     }
 
-    function pause(){
+    function pause() {
         //落下を止める
         if (isGame || isPause) {
             if (!isPause) {
                 document.getElementById("pause_box").hidden = false;
-                document.getElementById("ctr_btn1").hidden = true;
+
+                $('#controller').css('pointer-events', 'none');
+
                 clearInterval(IntervalId);
                 init_game_ui();
-                
+
                 context4.fillStyle = get_rgba('grey', 0.2, 1);
                 context4.fillRect(0, 0, game_ui.width, game_ui.height);
                 set_dot(temp_dot.pause);
@@ -499,14 +520,16 @@ $(function () {
 
             } else {
                 document.getElementById("pause_box").hidden = true;
-                document.getElementById("ctr_btn1").hidden = false;
+
+                $('#controller').css('pointer-events', '');
+
+
                 init_game_ui();
                 IntervalId = setInterval(fall_block, get_fall_time());
                 isFall = true;
                 isPause = false;
             }
-            return true;
-            
+            $('.openbtn1').toggleClass('active');
         }
     }
 
@@ -517,8 +540,8 @@ $(function () {
     /** ③指が動いたか検知 */
     $("#drop").on("touchmove", move_check);
 
-    /** ④指が離れたか検知 */
     $("#drop").on("touchend", end_check);
+
 
     /** 変数宣言 */
     var moveY1, moveX1, moveY2, moveX2, posiY, posiX, countX1, countY1;
@@ -538,14 +561,12 @@ $(function () {
         posiY = getY(event);
         posiX = getX(event);
 
-        //ダブルタップ
-        if (time_diff < 200 && coord.y > 1) {
+        if(time_diff < 200){
             while (!isConnect(0, 1, position.rotate)) {
-                fall_block();
+                fall_block(true);
                 tspin = null;
             }
             fall_block(true);
-            return;
         }
 
         time = now_time;
@@ -577,7 +598,7 @@ $(function () {
         if (!isGame) false;
 
         limitX = 15;
-        limitY = 50;
+        limitY = 5;
 
         var countX2 = Math.floor(Math.abs((posiX - getX(event)) / limitX));
         var countY2 = Math.floor(Math.abs((posiY - getY(event)) / limitY));
@@ -625,6 +646,8 @@ $(function () {
         }
 
 
+
+
         if (moveY1 != moveY2 || moveX1 != moveX2) {
             countX1 = 0;
             countY1 = 0;
@@ -640,7 +663,25 @@ $(function () {
         if (timerId4 != null) {
             speedSup();
         }
+            
+        if (moveY2 == "top") {
+            msgY = "上へ移動";
+            now_time = new Date();
+            time_diff = now_time - time;
+            if (time_diff > 50) {
+                hold();
+            }
 
+
+        }
+        else if (moveY2 == "bottom" && x == 0) {
+
+            msgY = "下へ移動";
+            speedSdown();
+        }
+        else {
+            msgY = "移動なし";
+        }
 
 
         if (moveX2 == "left" && y == 0) {
@@ -660,26 +701,6 @@ $(function () {
         else {
             msgX = "移動なし";
 
-        }
-
-
-        if (moveY2 == "top") {
-            msgY = "上へ移動";
-            now_time = new Date();
-            time_diff = now_time - time;
-            if (time_diff > 50) {
-                hold();
-            }
-
-
-        }
-        else if (moveY2 == "bottom" && x == 0) {
-
-            msgY = "下へ移動";
-            speedSdown();
-        }
-        else {
-            msgY = "移動なし";
         }
 
     }
@@ -715,12 +736,10 @@ $(function () {
 
     });
 
-    
+
     //ポーズ
     $(".openbtn1").click(function () {
-       if(pause()){
-            $(this).toggleClass('active');
-       }
+        pause();
     });
 
 

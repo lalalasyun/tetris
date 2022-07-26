@@ -269,3 +269,49 @@ const lockdown_timer = function () {
     lockdown_cnt = 0;
 
 }
+const score_normal = [0,100,300,500,800];
+const score_spin = 
+{
+    ts:400,
+    tss:800,
+    tsd:1200,
+    tst:1600
+};
+const score_perfect = [800,1000,1800,2000];
+function scoring(key,cnt){
+    console.log(key)
+    standard_score = 0;
+    addition_score = 0;
+    if(key == 'normal'){
+        standard_score = score_normal[cnt];
+    }else if(key.indexOf('m') != -1){
+        standard_score = score_normal[cnt];
+        addition_score = 100;
+    }else{
+        standard_score = score_spin[key];
+    }
+
+    if(isPerfect()){
+        addition_score += score_perfect[cnt];
+    }
+
+    //combo
+    standard_score += ren_count * 50;
+
+    if(backtoback_count > 1){
+        standard_score *= 1.5;
+    }
+
+    return standard_score + addition_score;
+}
+
+
+function add_score(point){
+    score += point;
+    $('#score').text(zeroPadding(score));
+}
+
+function zeroPadding(NUM){
+    LEN = 8;
+	return ( Array(LEN).join('0') + NUM ).slice( -LEN );
+}

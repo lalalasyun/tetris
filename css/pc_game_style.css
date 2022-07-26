@@ -6,13 +6,21 @@
   font-weight: bold;
 }
 
+#score{
+  color: whitesmoke;
+  font-size: 4rem;
+  font-weight: bold;
+  font-family:"ヒラギノ角ゴ ProN W3", HiraKakuProN-W3, 游ゴシック, "Yu Gothic", メイリオ, Meiryo, Verdana, Helvetica, Arial, sans-serif;
+  text-shadow: 1px 1px 4px rgb(0, 0, 0);
+}
+
 .line_table {
   height: 10px;
 }
 
 .game_button1{
   width: 100%;
-  height:500px;
+  height:100%;
   opacity:0;
 }
 
@@ -112,15 +120,17 @@ table.game_button2{
 
 /*ポーズボタン*/
 .openbtn1_block{
-  padding: 10px;
+  position:fixed;
+  right:5px;
+  bottom:5px;
 }
 
 .openbtn1{
   position: relative;
   background:#57a2c7;
   cursor: pointer;
-    width: 50px;
-    height:50px;
+  width: 50px;
+  height:50px;
   border-radius: 100%;
   margin: 0 0 0 auto;
 }
@@ -132,7 +142,7 @@ table.game_button2{
     left: 14px;
     height: 3px;
     border-radius: 2px;
-  background: #fff;
+    background: #fff;
     width: 45%;
   }
 
@@ -333,6 +343,12 @@ canvas {
   transform-origin: left top;
 }
 
+#score_box{
+  position: absolute;
+  bottom :-45px;
+  left:50px;
+}
+
 body {
   margin: 0px;
   padding: 0px;
@@ -344,9 +360,16 @@ header{
   width: 100%;
 }
 
-footer{
+#controller{
   position: fixed;
   width: 100%;
+  height:100%;
   bottom: 0px;
+}
+
+footer{
+  position: fixed;
+  bottom: 0px;
+  
 }
 

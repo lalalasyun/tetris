@@ -19,6 +19,8 @@ var level = 0;
 //levelごとの速度
 const fall_speed = [1.0,0.793,0.618,0.473,0.355,0.262,0.190,0.135,0.094,0.064,0.043,0.028,0.018,0.011,0.007];
 
+//score
+var score = 0;
 
 //操作フィールド[10,23]
 var field = init_field();
@@ -317,11 +319,13 @@ function game_over() {
     clearInterval(timerId3);
     timerId3 = null;
 
-    document.getElementById("ctr_btn1").hidden = true;
-    document.getElementById("openbtn1").hidden = true;
+    $("#openbtn1").hide();
+
 
     document.getElementById("endstart_box").hidden = true;
     document.getElementById("end_box").hidden = false;
+
+    $('#controller').css('pointer-events', 'none');
 }
 
 var gameover_time = 0;
@@ -373,6 +377,8 @@ function load() {
     var height = screen.availHeight;
     var z = 1;
 
+    $("#openbtn1").hide();
+    $('#controller').css('pointer-events', 'none');
    
     if(width < 680 || height < 850){
         if(width < 680){
@@ -381,8 +387,6 @@ function load() {
             z = height / 900;
         }
         
-        document.getElementById("ctr_btn1").hidden = true;
-        document.getElementById("ctr_btn2").hidden = true;
         
 
         const game_main_dom = document.getElementById("game_main").style;
@@ -391,7 +395,8 @@ function load() {
         game_main_dom.height = height +"px";
 
         $('#modal').fadeTo(200, 1);
-
+        
+        
         isMobile = true;
     }else{
         document.getElementById("modal").style.top = "150px";

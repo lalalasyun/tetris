@@ -2,15 +2,15 @@
 var timeout_timer = null;
 var fall_keyEvent_cnt = 0;
 const fall_block = isKeyEvent => {
-   
-
     
     if (isConnect(0, 1)) {
         clearInterval(IntervalId);
         lockdown_mode(isKeyEvent);
         return;
     }
+    if(isKeyEvent != null) add_score(1);
     coord.y++;
+    
 
     init_game();
     set_block_field();
@@ -42,12 +42,12 @@ function definition_block(d) {
         return true;
     }
 
+    var score_key = 'normal';
+
     //壊したlineの数を取得し画面に描画する
     var line_list = check_line();
 
-    
-
-    cnt = line_list.length;
+    var cnt = line_list.length;
 
     init_event_text();
 
@@ -57,6 +57,7 @@ function definition_block(d) {
         if(result != null){
             backtoback_count++;
             set_tspin(result);
+            score_key = result;
         }
     }
 
@@ -87,6 +88,8 @@ function definition_block(d) {
     }
 
     if(isPerfect())set_perfect();
+
+    add_score(scoring(score_key,cnt));
     
 
     if (isLine10(count_line)) set_levelup();
