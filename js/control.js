@@ -416,6 +416,7 @@ $(function () {
 
         document.getElementById("ctr_btn1").hidden = true;
         document.getElementById("openbtn1").hidden = true;
+        document.getElementById("pause_box").hidden = true;
 
         document.getElementById("endstart_box").hidden = false;
         document.getElementById("end_box").hidden = true;
@@ -471,7 +472,10 @@ $(function () {
         backtoback_count = 0;
 
         //pause
-        isPause = false;
+        if(isPause){
+            isPause = false;
+            $(".openbtn1").toggleClass('active');
+        }
 
         set_dot(temp_dot.home);
 
@@ -482,6 +486,7 @@ $(function () {
         if (isGame || isPause) {
             if (!isPause) {
                 document.getElementById("pause_box").hidden = false;
+                document.getElementById("ctr_btn1").hidden = true;
                 clearInterval(IntervalId);
                 init_game_ui();
                 
@@ -491,13 +496,16 @@ $(function () {
 
                 isFall = false;
                 isPause = true;
+
             } else {
                 document.getElementById("pause_box").hidden = true;
+                document.getElementById("ctr_btn1").hidden = false;
                 init_game_ui();
                 IntervalId = setInterval(fall_block, get_fall_time());
                 isFall = true;
                 isPause = false;
             }
+            return true;
             
         }
     }
@@ -628,8 +636,6 @@ $(function () {
     function end_check(event, x, y) {
         handle(event);
         if (!isGame) false;
-        console.log(msgX, msgY);
-        console.log(x, y);
 
         if (timerId4 != null) {
             speedSup();
@@ -712,10 +718,9 @@ $(function () {
     
     //ポーズ
     $(".openbtn1").click(function () {
-        $(this).toggleClass('active');
-
-        pause();
-        
+       if(pause()){
+            $(this).toggleClass('active');
+       }
     });
 
 
